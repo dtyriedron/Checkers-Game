@@ -6,8 +6,8 @@ import javax.swing.*;
 
 public class GameWindow extends JPanel implements MouseListener, MouseMotionListener
 {
-    public static final int WIDTH = 450;
-    public static final int HEIGHT = 450;
+    public static final int WIDTH = 400;
+    public static final int HEIGHT = 400;
     private GameSetup gameSet = new GameSetup();
     private GameLoop loopGame = new GameLoop();
 
@@ -23,9 +23,6 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         loopGame.start();
     }
 
-
-
-
     public void paint(Graphics g)
     {
         gameSet.paint(g);
@@ -33,7 +30,10 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void mouseClicked(MouseEvent e)
     {
-        System.out.println("Mouse Clicked!!!!!!!!!");
+        mouse_x= e.getX();
+        mouse_y = e.getY();
+        Move move = new Move();
+        move.test(e.getX(), e.getY());
     }
     public void mouseDragged(MouseEvent e)
     {
@@ -42,7 +42,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     public void mouseMoved(MouseEvent e)
     {
         setMousePosition(e);
-        System.out.println(mouse_x+ ", "+mouse_y);
+       // System.out.println(mouse_x+ ", "+mouse_y);
     }
 
     private void setMousePosition(MouseEvent e)
