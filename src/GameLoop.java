@@ -1,11 +1,14 @@
-public class GameLoop implements Runnable
-{
+import javax.swing.*;
+import java.awt.*;
 
+public class GameLoop extends JPanel implements Runnable
+{
+    GameSetup gameSet = new GameSetup();
     //game loop fields
     private Thread thread;
     private int FPS=30;
     private long targetTime = 1000/FPS;
-    private boolean isRunning = false;
+    public boolean isRunning = false;
 
     public void start()
     {
@@ -29,7 +32,11 @@ public class GameLoop implements Runnable
 
     public GameLoop()
     {
+    }
 
+    public void paintComponent(Graphics g)
+    {
+        gameSet.paint(g);
     }
 
     //game loop
@@ -41,6 +48,7 @@ public class GameLoop implements Runnable
             start = System.currentTimeMillis();
 
             update();
+            repaint();
             elapsed = System.currentTimeMillis() - start;
 
             wait = targetTime - elapsed;

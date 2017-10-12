@@ -7,16 +7,27 @@ import static java.sql.Types.NULL;
 public class GameSetup
 {
     Piece piece = new Piece();
+    Move move = new Move();
+
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
+
+    private int highlightX, highlightY;
+
     //size of the board
     static final int BOARD_SIZE = 8;
     public int row = 0;
+
+    //array to store checkers
+    private int[][] board;
     public GameSetup()
     {
+        //store the board into a 2d array
+        board = new int [BOARD_SIZE][BOARD_SIZE];
+        installCheckers();
     }
 
-    private void installCheckers(int [][] board, int BOARD_SIZE)
+    private void installCheckers()
     {
         for (row = 0; row < BOARD_SIZE; row += 2)
         {
@@ -24,8 +35,7 @@ public class GameSetup
             board[2][row] = piece.BLACK;
             board[6][row] = piece.WHITE;
         }
-        for (row = 1; row < BOARD_SIZE; row += 2)
-        {
+        for (row = 1; row < BOARD_SIZE; row += 2) {
             board[1][row] = piece.BLACK;
             board[5][row] = piece.WHITE;
             board[7][row] = piece.WHITE;
@@ -41,11 +51,6 @@ public class GameSetup
         int x=0;
         int y=0;
 
-        //store the board into a 2d array
-        int [][] board = new int [BOARD_SIZE][BOARD_SIZE];
-
-        //put the checkers on the board
-        installCheckers(board, BOARD_SIZE);
         //loop for every row
         for (int i=0; i<BOARD_SIZE;i++)
         {
@@ -57,8 +62,6 @@ public class GameSetup
             //loop for every square within row
             for(int j=0;j<BOARD_SIZE;j++)
             {
-                //increment the x so that there is a new square beside the last
-                x+=WIDTH;
                 if (j%2==0)
                 {
                     //for every second row the colour changes
@@ -80,12 +83,28 @@ public class GameSetup
                     g2d.setColor(Color.DARK_GRAY);
                     g2d.fillOval(x + 10, y + 10, 3*WIDTH/4,3*HEIGHT/4);
                 }
-
+                //increment the x so that there is a new square beside the last
+                x+=WIDTH;
             }
         }
 
+        if(move.calledTest())
+        {
+            g2d.setColor(Color.ORANGE);
+            g2d.drawRect(highlightX * 60, highlightY * 60, 60, 60);
+            System.out.println("painted something");
+        }
         g2d.dispose();
 
+    }
+
+    public void highlight(int x, int y) {
+        this.highlightX = x;
+        this.highlightY = y;
+    }
+
+    public int[][] getBoard() {
+        return board;
     }
 
 }
