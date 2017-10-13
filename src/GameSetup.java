@@ -7,10 +7,10 @@ import static java.sql.Types.NULL;
 public class GameSetup
 {
     Piece piece = new Piece();
-    Move move = new Move();
 
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
+    public static int clicked = 0;
 
     private int highlightX, highlightY;
 
@@ -88,19 +88,29 @@ public class GameSetup
             }
         }
 
-        if(move.calledTest())
+        if(clicked ==1)
         {
             g2d.setColor(Color.ORANGE);
+            // todo this println shows that the variables are 0
+            System.out.println("row: "+highlightX+" col: "+highlightY);
             g2d.drawRect(highlightX * 60, highlightY * 60, 60, 60);
-            System.out.println("painted something");
         }
         g2d.dispose();
 
     }
 
-    public void highlight(int x, int y) {
+    public void highlight(int x, int y)
+    {
         this.highlightX = x;
         this.highlightY = y;
+        //todo these are both zero and need to change when the mouse is clicked to different coords
+    }
+
+    public void test()
+    {
+        clicked++;
+        if(clicked>1)
+            clicked=0;
     }
 
     public int[][] getBoard() {

@@ -1,15 +1,13 @@
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import javax.swing.*;
 
-public class GameWindow extends JPanel implements MouseListener, MouseMotionListener
+public class GameWindow extends JPanel implements MouseListener, MouseMotionListener, Runnable
 {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
     private GameSetup gameSet = new GameSetup();
-    private GameLoop loopGame = new GameLoop();
+    public static int BLANK = 1;
 
     //mouse position
     public static int mouse_x, mouse_y;
@@ -20,7 +18,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
-        loopGame.start();
+        start();
     }
 
     public void paint(Graphics g)
@@ -30,6 +28,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void mouseClicked(MouseEvent e)
     {
+        BLANK = 2;
         mouse_x= e.getX();
         mouse_y = e.getY();
         Move move = new Move();
@@ -72,6 +71,90 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         frame.setLocationRelativeTo(null);
         frame.setSize(600,600);
         frame.setVisible(true);
+    }
+
+    //game loop fields
+    private Thread thread;
+    private int FPS=30;
+    private long targetTime = 1000/FPS;
+    public boolean isRunning = false;
+
+
+    public void start()
+    {
+        isRunning = true;
+        thread = new Thread(this, "Game Loop");
+        thread.start();
+    }
+
+
+    public void stop()
+    {
+        isRunning=false;
+        try
+        {
+            thread.join();
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    public void paintComponent(Graphics g)
+    {
+        gameSet.paint(g);
+    }
+
+    //game loop
+    public void run()
+    {
+        /*int timerDelay = 20;
+        new Timer(timerDelay, new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                update();
+                repaint();
+            }
+        });*/
+        long start, elapsed, wait =0;
+
+        while(isRunning)
+        {
+            start = System.currentTimeMillis();
+
+            update();
+            repaint();
+
+            elapsed = System.currentTimeMillis() - start;
+
+            wait = targetTime - elapsed;
+            if(wait<5)
+            {
+                wait =5;
+            }
+            try
+            {
+                Thread.sleep(wait);
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+        stop();
+    }
+
+    private int x=0;
+
+    public void update()
+    {
+        if(BLANK ==2)
+        {
+            gameSet.test();
+            BLANK=1;
+        }
+        x++;
     }
 
 

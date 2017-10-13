@@ -13,18 +13,14 @@ public class Move extends JPanel
 
     int row = 0;
     int col = 0;
-    public static boolean blank = false;
 
     public void test(int x, int y)
     {
         GameSetup gameSet = new GameSetup();
-        blank=true;
-        System.out.println("This is the MOVE CLASS. Coords: " + x + " " + y);
         int low_range_y = 0;
         int high_range_y = 60;
         int low_range_x=0;
         int high_range_x=60;
-
 
         for (int i=0;i<gameSet.BOARD_SIZE; ++i)
         {
@@ -55,12 +51,7 @@ public class Move extends JPanel
                 col++;
             }
         }
-
         gameSet.highlight(row, col);
-    }
-    public static boolean calledTest()
-    {
-        return blank;
     }
 
 }
