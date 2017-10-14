@@ -9,6 +9,12 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     private GameSetup gameSet = new GameSetup();
     public static int BLANK = 1;
 
+    //game loop fields
+    private Thread thread;
+    private int FPS=30;
+    private long targetTime = 1000/FPS;
+    public boolean isRunning = false;
+
     //mouse position
     public static int mouse_x, mouse_y;
 
@@ -21,13 +27,10 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         start();
     }
 
-    public void paint(Graphics g)
-    {
-        gameSet.paint(g);
-    }
 
     public void mouseClicked(MouseEvent e)
     {
+        gameSet.update(mouse_y / 60, mouse_x / 60);
         BLANK = 2;
         mouse_x= e.getX();
         mouse_y = e.getY();
@@ -73,11 +76,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         frame.setVisible(true);
     }
 
-    //game loop fields
-    private Thread thread;
-    private int FPS=30;
-    private long targetTime = 1000/FPS;
-    public boolean isRunning = false;
+
 
 
     public void start()
@@ -104,7 +103,9 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void paintComponent(Graphics g)
     {
+        Graphics2D g2d = (Graphics2D) g;
         gameSet.paint(g);
+        g2d.dispose();
     }
 
     //game loop
@@ -118,7 +119,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
                 repaint();
             }
         });*/
-        long start, elapsed, wait =0;
+        long start, elapsed, wait;
 
         while(isRunning)
         {
@@ -152,6 +153,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         if(BLANK ==2)
         {
             gameSet.test();
+
             BLANK=1;
         }
         x++;

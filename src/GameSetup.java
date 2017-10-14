@@ -11,6 +11,9 @@ public class GameSetup
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
     public static int clicked = 0;
+    public static boolean isOccupied =false;
+    public int cur_row;
+    public int cur_col;
 
     private int highlightX, highlightY;
 
@@ -20,6 +23,7 @@ public class GameSetup
 
     //array to store checkers
     private int[][] board;
+
     public GameSetup()
     {
         //store the board into a 2d array
@@ -39,6 +43,33 @@ public class GameSetup
             board[1][row] = piece.BLACK;
             board[5][row] = piece.WHITE;
             board[7][row] = piece.WHITE;
+        }
+    }
+    public void highlight(int x, int y)
+    {
+        this.highlightX = x;
+        this.highlightY = y;
+        //todo these are both zero and need to change when the mouse is clicked to different coords
+    }
+
+    public void test()
+    {
+        clicked++;
+        if(clicked>1)
+            clicked=0;
+    }
+
+    public void removeChecker(int row, int col)
+    {
+        if(board[row][col] != NULL)
+        {
+            isOccupied = true;
+            cur_row=row;
+            cur_col=col;
+        }
+        else
+        {
+            isOccupied = false;
         }
     }
 
@@ -75,45 +106,44 @@ public class GameSetup
 
                 if(board[i][j] != NULL && board[i][j] ==piece.WHITE)
                 {
-                    g2d.setColor(Color.white);
-                    g2d.fillOval(x + 10, y + 10, 3*WIDTH/4,3*HEIGHT/4);
+                    if(board[i][j] != NULL) {
+                        g2d.setColor(Color.red);
+                    }
+                    //g2d.setColor(Color.white);
+                    //g2d.fillOval(x + 10, y + 10, 3*WIDTH/4,3*HEIGHT/4);
                 }
                 else if(board[i][j] != NULL && board[i][j]==piece.BLACK)
                 {
                     g2d.setColor(Color.DARK_GRAY);
-                    g2d.fillOval(x + 10, y + 10, 3*WIDTH/4,3*HEIGHT/4);
                 }
                 //increment the x so that there is a new square beside the last
+
+                g2d.fillOval(x + 10, y + 10, 3*WIDTH/4,3*HEIGHT/4);
                 x+=WIDTH;
             }
         }
 
-        if(clicked ==1)
-        {
-            g2d.setColor(Color.ORANGE);
-            // todo this println shows that the variables are 0
-            System.out.println("row: "+highlightX+" col: "+highlightY);
-            g2d.drawRect(highlightX * 60, highlightY * 60, 60, 60);
-        }
-        g2d.dispose();
-
     }
 
-    public void highlight(int x, int y)
+    public void update(int x, int y) {
+        remove(x, y);
+        System.out.println(x + ", " + y);
+    }
+
+    private void remove(int x, int y) {
+        board[x][y] = NULL;
+    }
+
+
+    public void isValid()
     {
-        this.highlightX = x;
-        this.highlightY = y;
-        //todo these are both zero and need to change when the mouse is clicked to different coords
+        //highlight the currently selected checkers options
+
     }
 
-    public void test()
+
+    public int[][] getBoard()
     {
-        clicked++;
-        if(clicked>1)
-            clicked=0;
-    }
-
-    public int[][] getBoard() {
         return board;
     }
 

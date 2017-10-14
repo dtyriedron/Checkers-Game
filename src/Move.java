@@ -8,7 +8,8 @@ public class Move extends JPanel
     //determine if the piece is a king
 
     public Move()
-    {}
+    {
+    }
 
 
     int row = 0;
@@ -51,7 +52,10 @@ public class Move extends JPanel
                 col++;
             }
         }
+        gameSet.removeChecker(row,col);
         gameSet.highlight(row, col);
     }
+
+
 
 }
