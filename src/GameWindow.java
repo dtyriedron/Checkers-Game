@@ -7,6 +7,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
     private GameSetup gameSet = new GameSetup();
+    private Move move = new Move();
     public static int BLANK = 1;
 
     //game loop fields
@@ -30,12 +31,12 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void mouseClicked(MouseEvent e)
     {
-        gameSet.update(mouse_y / 60, mouse_x / 60);
+        System.out.println("row: "+e.getX()+" col: "+e.getY());
+        move.test(e.getX(), e.getY());
+        gameSet.update(mouse_x / 60, mouse_y / 60);
         BLANK = 2;
         mouse_x= e.getX();
         mouse_y = e.getY();
-        Move move = new Move();
-        move.test(e.getX(), e.getY());
     }
     public void mouseDragged(MouseEvent e)
     {
@@ -152,7 +153,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     {
         if(BLANK ==2)
         {
-            gameSet.test();
+            gameSet.click();
 
             BLANK=1;
         }

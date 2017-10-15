@@ -1,7 +1,11 @@
 import javax.swing.*;
 
+import static java.sql.Types.NULL;
+
 public class Move extends JPanel
 {
+    GameSetup gameSet = new GameSetup();
+    Piece piece =new Piece();
     //determine whether the piece can move
     //determine whether the piece can take an opposing piece
     //determine whether the piece has moved to the end of the board
@@ -12,49 +16,18 @@ public class Move extends JPanel
     }
 
 
+
     int row = 0;
     int col = 0;
 
     public void test(int x, int y)
     {
-        GameSetup gameSet = new GameSetup();
-        int low_range_y = 0;
-        int high_range_y = 60;
-        int low_range_x=0;
-        int high_range_x=60;
 
-        for (int i=0;i<gameSet.BOARD_SIZE; ++i)
-        {
-
-            if (y > low_range_y && y < high_range_y)
-            {
-                System.out.println("row: "+row);
-                i=gameSet.BOARD_SIZE;
-            }
-            else
-            {
-                low_range_y += 60;
-                high_range_y += 60;
-                row++;
-            }
-        }
-        for(int j=0;j<gameSet.BOARD_SIZE;++j)
-        {
-            if(x> low_range_x && x<high_range_x)
-            {
-                System.out.println("col: "+col);
-                j=gameSet.BOARD_SIZE;
-            }
-            else
-            {
-                low_range_x+=60;
-                high_range_x+=60;
-                col++;
-            }
-        }
-        gameSet.removeChecker(row,col);
+        row = y/60;
+        col = x/60;
         gameSet.highlight(row, col);
     }
+
 
 
 
