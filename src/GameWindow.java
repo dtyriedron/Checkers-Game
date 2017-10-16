@@ -7,7 +7,6 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
     private GameSetup gameSet = new GameSetup();
-    private Move move = new Move();
     public static int BLANK = 1;
 
     //game loop fields
@@ -31,12 +30,11 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void mouseClicked(MouseEvent e)
     {
-        System.out.println("row: "+e.getX()+" col: "+e.getY());
-        move.test(e.getX(), e.getY());
-        gameSet.update(mouse_x / 60, mouse_y / 60);
-        BLANK = 2;
-        mouse_x= e.getX();
+        mouse_x = e.getX();
         mouse_y = e.getY();
+        gameSet.update((mouse_x / 60), (mouse_y / 60));
+        BLANK = 2;
+
     }
     public void mouseDragged(MouseEvent e)
     {
@@ -61,24 +59,6 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     public void mouseEntered(MouseEvent e) {}
 
     public void mouseExited(MouseEvent e) {}
-
-    public static void main(String[] args)
-    {
-        //set the gui and graphics
-        JFrame frame = new JFrame("checkers");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(new GameWindow());
-        frame.setResizable(false);
-        frame.setLayout(new BorderLayout());
-        frame.add(new GameWindow(), BorderLayout.CENTER);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setSize(600,600);
-        frame.setVisible(true);
-    }
-
-
-
 
     public void start()
     {
@@ -158,6 +138,21 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
             BLANK=1;
         }
         x++;
+    }
+
+    public static void main(String[] args)
+    {
+        //set the gui and graphics
+        JFrame frame = new JFrame("checkers");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setContentPane(new GameWindow());
+        frame.setResizable(false);
+        frame.setLayout(new BorderLayout());
+        frame.add(new GameWindow(), BorderLayout.CENTER);
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setSize(600,600);
+        frame.setVisible(true);
     }
 
 
