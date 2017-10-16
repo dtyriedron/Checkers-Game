@@ -6,7 +6,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
-    private GameSetup gameSet = new GameSetup();
+    private Board gameSet = new Board();
     public static int BLANK = 1;
 
     //game loop fields
@@ -159,7 +159,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     */
     /*
 //todo put this into another class::
-    public static void move(String[][] board, int player)
+    public static void move(String[][] Board, int player)
     {
         //create a buffered reader to read the move
 

@@ -4,7 +4,7 @@ import java.awt.*;
 import static java.sql.Types.NULL;
 
 
-public class GameSetup
+public class Board
 {
     Piece piece = new Piece();
 
@@ -23,16 +23,16 @@ public class GameSetup
 
     private int highlightX, highlightY;
 
-    //size of the board
+    //size of the Board
     static final int BOARD_SIZE = 8;
     public int row = 0;
 
     //array to store checkers
     private int[][] board;
 
-    public GameSetup()
+    public Board()
     {
-        //store the board into a 2d array
+        //store the Board into a 2d array
         board = new int [BOARD_SIZE][BOARD_SIZE];
         installCheckers();
     }
@@ -88,7 +88,7 @@ public class GameSetup
         Graphics2D g2d = (Graphics2D) g;
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        //dimensions of the rectangle of the board
+        //dimensions of the rectangle of the Board
         int x=0;
         int y=0;
 
@@ -143,7 +143,6 @@ public class GameSetup
                 validMove();
                 if(isblack)
                 {
-                    System.out.println("woof");
                     if(blackcanmoveright)
                     {
                         if ((highlightX + 1) < BOARD_SIZE)
@@ -161,7 +160,6 @@ public class GameSetup
                 }
                 if(iswhite)
                 {
-                    System.out.println("ruff");
                     if(whitecanmoveright)
                     {
                         if ((highlightX + 1) < BOARD_SIZE)
