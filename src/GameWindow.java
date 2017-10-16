@@ -27,14 +27,12 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         start();
     }
 
-
-    public void mouseClicked(MouseEvent e)
+    public void mouseClicked (MouseEvent e)
     {
         mouse_x = e.getX();
         mouse_y = e.getY();
         gameSet.update((mouse_x / 60), (mouse_y / 60));
         BLANK = 2;
-
     }
     public void mouseDragged(MouseEvent e)
     {

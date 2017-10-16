@@ -12,6 +12,12 @@ public class Move extends JPanel
     {
     }
 
+    //GameSetup gameSet = new GameSetup();
+    public void test()
+    {
+        System.out.println("hey");
+    }
+
 
 
 }

@@ -140,27 +140,41 @@ public class GameSetup
 
             try
             {
-                if(board[highlightY][highlightX] == piece.BLACK)
+                validMove();
+                if(isblack)
                 {
-                    if (board[highlightY + 1][highlightX + 1] == NULL || (board[highlightY + 1][highlightX + 1] == piece.WHITE && board[highlightY + 2][highlightX + 2] == NULL))
+                    System.out.println("woof");
+                    if(blackcanmoveright)
                     {
-                        g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
+                        if ((highlightX + 1) < BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
+                        }
                     }
-                    if (board[highlightY + 1][highlightX - 1] == NULL || (board[highlightY + 1][highlightX - 1] == piece.WHITE && board[highlightY + 2][highlightX - 2] == NULL))
+                    if(blackcanmoveleft)
                     {
-                        g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
+                        if ((highlightX - 1) >= 0)
+                        {
+                            g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
+                        }
                     }
                 }
-
-                if(board[highlightY][highlightX] == piece.WHITE)
+                if(iswhite)
                 {
-                    if(board[highlightY - 1][highlightX - 1] == NULL || (board[highlightY - 1][highlightX - 1] == piece.BLACK && board[highlightY - 2][highlightX - 2] == NULL))
+                    System.out.println("ruff");
+                    if(whitecanmoveright)
                     {
-                        g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+                        if ((highlightX + 1) < BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+                        }
                     }
-                    if(board[highlightY - 1][highlightX + 1] == NULL || (board[highlightY - 1][highlightX + 1] == piece.BLACK && board[highlightY - 2][highlightX + 2] == NULL))
+                    if(whitecanmoveleft)
                     {
-                        g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+                        if ((highlightX - 1) >= 0)
+                        {
+                            g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+                        }
                     }
                 }
             }catch(ArrayIndexOutOfBoundsException e){}
@@ -187,39 +201,43 @@ public class GameSetup
         //highlight the currently selected checkers options
 
         //check if the piece is black
-        if(board[highlightY][highlightX] == piece.BLACK && isOccupied)
+        if(board[highlightY][highlightX] == piece.BLACK)
         {
             isblack = true;
-            //System.out.println("variable: " + isblack);
         }
         else
         {
             isblack=false;
         }
 
-        //check if the piece can move right and down
-        if (board[highlightY + 1][highlightX + 1] == NULL || (board[highlightY + 1][highlightX + 1] == piece.WHITE && board[highlightY + 2][highlightX + 2] == NULL)) {
-            blackcanmoveright = true;
-        }
-        else
+        try
         {
-            blackcanmoveright = false;
-        }
+            //check if the piece can move right and down
+            if (board[highlightY + 1][highlightX + 1] == NULL || (board[highlightY + 1][highlightX + 1] == piece.WHITE && board[highlightY + 2][highlightX + 2] == NULL))
+            {
+                blackcanmoveright = true;
+            } else
+            {
+                blackcanmoveright = false;
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
 
-        //check if the piece can move left and down
-        if (board[highlightY + 1][highlightX - 1] == NULL || (board[highlightY + 1][highlightX - 1] == piece.WHITE && board[highlightY + 2][highlightX - 2] == NULL))
+        try
         {
-            blackcanmoveleft = true;
-        }
-        else
-        {
-            blackcanmoveleft = false;
-        }
-
+            //check if the piece can move left and down
+            if (board[highlightY + 1][highlightX - 1] == NULL || (board[highlightY + 1][highlightX - 1] == piece.WHITE && board[highlightY + 2][highlightX - 2] == NULL))
+            {
+                blackcanmoveleft = true;
+            }
+            else
+            {
+                blackcanmoveleft = false;
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
 
 
         //check is the piece is white
-        if(board[highlightY][highlightX] == piece.WHITE && isOccupied)
+        if(board[highlightY][highlightX] == piece.WHITE)
         {
             iswhite=true;
         }
@@ -228,25 +246,31 @@ public class GameSetup
             iswhite=false;
         }
 
-        //check if the piece can go up and left
-        if(board[highlightY - 1][highlightX - 1] == NULL || (board[highlightY - 1][highlightX - 1] == piece.BLACK && board[highlightY - 2][highlightX - 2] == NULL))
+        try
         {
-            whitecanmoveleft=true;
-        }
-        else
-        {
-            whitecanmoveleft=false;
-        }
+            //check if the piece can up and right
+            if (board[highlightY - 1][highlightX + 1] == NULL || (board[highlightY - 1][highlightX + 1] == piece.BLACK && board[highlightY - 2][highlightX + 2] == NULL))
+            {
+                whitecanmoveright = true;
+            } else
+            {
+                whitecanmoveright = false;
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
 
-        //check if the piece can up and right
-        if(board[highlightY - 1][highlightX + 1] == NULL || (board[highlightY - 1][highlightX + 1] == piece.BLACK && board[highlightY - 2][highlightX + 2] == NULL))
+        //check if the piece can go up and left
+        try
         {
-            whitecanmoveright=true;
-        }
-        else
-        {
-            whitecanmoveright=false;
-        }
+            if (board[highlightY - 1][highlightX - 1] == NULL || (board[highlightY - 1][highlightX - 1] == piece.BLACK && board[highlightY - 2][highlightX - 2] == NULL))
+            {
+                whitecanmoveleft = true;
+            }
+            else
+            {
+                whitecanmoveleft = false;
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
+
     }
 
     public int[][] getBoard()
