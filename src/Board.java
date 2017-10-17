@@ -10,16 +10,24 @@ public class Board
 
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
-    public static int clicked = 0;
     public static boolean isRemoved = false;
     public static boolean isOccupied = false;
 
-    public boolean isblack=false;
-    public boolean blackcanmoveright=false;
-    public boolean blackcanmoveleft=false;
-    public boolean iswhite=false;
-    public boolean whitecanmoveright=false;
-    public boolean whitecanmoveleft=false;
+    public int right_old_click_x=40;
+    public int right_old_click_y=40;
+    public int left_old_click_x=40;
+    public int left_old_click_y=40;
+    public int xmod=0;
+    public int ymod=0;
+
+    public boolean isblack = false;
+    public boolean isoldblack = false;
+    public boolean blackcanmoveright = false;
+    public boolean blackcanmoveleft = false;
+    public boolean iswhite = false;
+    public boolean isoldwhite = false;
+    public boolean whitecanmoveright = false;
+    public boolean whitecanmoveleft = false;
 
     private int highlightX, highlightY;
 
@@ -55,7 +63,6 @@ public class Board
     public void update(int x, int y)
     {
         highlight(x,y);
-    //remove(x, y);
     }
 
     public void highlight(int x, int y)
@@ -76,12 +83,6 @@ public class Board
         catch(ArrayIndexOutOfBoundsException e){}
     }
 
-    public void click()
-    {
-        clicked++;
-        if(clicked>1)
-            clicked=0;
-    }
 
     public void paint(Graphics g)
     {
@@ -181,7 +182,7 @@ public class Board
 
     }
 
-    private void remove(int x, int y)
+    private void removeChecker(int x, int y)
     {
         board[y][x] = NULL;
         if (board[y][x] == NULL)
@@ -193,20 +194,80 @@ public class Board
             isRemoved = false;
         }
     }
+    private void addChecker(int x, int y)
+    {
+        if(board[y][x]==NULL && isoldblack==true)
+        {
+            board[y][x] = piece.BLACK;
+        }
+        if(board[y][x]==NULL && isoldwhite==true)
+        {
+            board[y][x] = piece.WHITE;
+        }
+    }
+
+    public void isMoving(int x, int y)
+    {
+        System.out.println("x: "+x+" y: "+y);
+        System.out.println("old x: "+left_old_click_x+ " old y: "+left_old_click_y);
+
+        //black can move left
+        try
+        {
+            if (x+1==left_old_click_x && y-1==left_old_click_y&& board[left_old_click_y][left_old_click_x]==piece.BLACK&&(board[y][x]==piece.WHITE|| board[y][x]==NULL))
+            {
+                isoldblack=true;
+                removeChecker(left_old_click_x,left_old_click_y);
+                addChecker(x,y);
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
+
+        //black can move right
+        try
+        {
+            if(x-1==right_old_click_x && y-1==right_old_click_y && board[right_old_click_y][right_old_click_x]==piece.BLACK && (board[y][x]==piece.WHITE || board[y][x]==NULL))
+            {
+                isoldblack=true;
+                removeChecker(right_old_click_x,right_old_click_y);
+                addChecker(x,y);
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
+
+        //white can move left
+        try
+        {
+            if(x+1==left_old_click_x && y+1==left_old_click_y && board[left_old_click_y][left_old_click_x]==piece.WHITE&&(board[y][x]==piece.BLACK|| board[y][x]==NULL))
+            {
+                isoldwhite=true;
+                removeChecker(left_old_click_x,left_old_click_y);
+                addChecker(x,y);
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
+
+        //white can move right
+        try
+        {
+            if(x-1==right_old_click_x && y+1==right_old_click_y && board[right_old_click_y][right_old_click_x]==piece.WHITE && (board[y][x]==piece.BLACK || board[y][x]==NULL))
+            {
+                isoldwhite=true;
+                removeChecker(right_old_click_x,right_old_click_y);
+                addChecker(x,y);
+            }
+        }catch(ArrayIndexOutOfBoundsException e){}
+    }
 
     public void validMove()
     {
-        //highlight the currently selected checkers options
 
-        //check if the piece is black
-        if(board[highlightY][highlightX] == piece.BLACK)
-        {
-            isblack = true;
-        }
-        else
-        {
-            isblack=false;
-        }
+            //check if the piece is black
+            if (board[highlightY + ymod][highlightX + xmod] == piece.BLACK)
+            {
+                isblack = true;
+            }
+            else
+            {
+                isblack = false;
+            }
 
         try
         {
@@ -214,6 +275,8 @@ public class Board
             if (board[highlightY + 1][highlightX + 1] == NULL || (board[highlightY + 1][highlightX + 1] == piece.WHITE && board[highlightY + 2][highlightX + 2] == NULL))
             {
                 blackcanmoveright = true;
+                right_old_click_x= highlightX;
+                right_old_click_y= highlightY;
             } else
             {
                 blackcanmoveright = false;
@@ -225,7 +288,10 @@ public class Board
             //check if the piece can move left and down
             if (board[highlightY + 1][highlightX - 1] == NULL || (board[highlightY + 1][highlightX - 1] == piece.WHITE && board[highlightY + 2][highlightX - 2] == NULL))
             {
+                //System.out.println("x: "+left_old_click_x + " y: "+left_old_click_y);
                 blackcanmoveleft = true;
+                left_old_click_x= highlightX;
+                left_old_click_y= highlightY;
             }
             else
             {
@@ -250,6 +316,8 @@ public class Board
             if (board[highlightY - 1][highlightX + 1] == NULL || (board[highlightY - 1][highlightX + 1] == piece.BLACK && board[highlightY - 2][highlightX + 2] == NULL))
             {
                 whitecanmoveright = true;
+                right_old_click_x= highlightX;
+                right_old_click_y= highlightY;
             } else
             {
                 whitecanmoveright = false;
@@ -262,6 +330,8 @@ public class Board
             if (board[highlightY - 1][highlightX - 1] == NULL || (board[highlightY - 1][highlightX - 1] == piece.BLACK && board[highlightY - 2][highlightX - 2] == NULL))
             {
                 whitecanmoveleft = true;
+                left_old_click_x= highlightX;
+                left_old_click_y= highlightY;
             }
             else
             {
