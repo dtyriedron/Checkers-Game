@@ -2,12 +2,16 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
+import static java.sql.Types.NULL;
+
 public class GameWindow extends JPanel implements MouseListener, MouseMotionListener, Runnable
 {
     public static final int WIDTH = 400;
     public static final int HEIGHT = 400;
-    private Board gameSet = new Board();
-    public static int BLANK = 1;
+    private Board board = new Board();
+    public static int player = 1;
+    private Piece piece = new Piece();
+    public int clicks=0;
 
     //game loop fields
     private Thread thread;
@@ -17,6 +21,8 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     //mouse position
     public static int mouse_x, mouse_y;
+    public int old_click_x=40;
+    public int old_click_y=40;
 
     public GameWindow()
     {
@@ -29,10 +35,89 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void mouseClicked (MouseEvent e)
     {
-        mouse_x = e.getX();
-        mouse_y = e.getY();
-        gameSet.update((mouse_x / 60), (mouse_y / 60));
-        gameSet.isMoving(mouse_x/60,mouse_y/60);
+        mouse_x = e.getX()/60;
+        mouse_y = e.getY()/60;
+        board.highlight(mouse_x,mouse_y);
+        clicks++;
+
+        if(player>2)
+        {
+            player = 1;
+        }
+
+        if(player==1)
+        {
+            System.out.println("\n                    player 1                                    \n");
+            if(board.getBoard()[mouse_y][mouse_x]==piece.WHITE && clicks==1)
+            {
+                clicks--;
+                board.update((mouse_x), (mouse_y));
+                old_click_x=mouse_x;
+                old_click_y=mouse_y;
+            }
+
+            if(board.getBoard()[mouse_y][mouse_x]==NULL && board.getBoard()[old_click_y][old_click_x]==piece.WHITE)
+            {
+                System.out.println("click: "+clicks);
+                board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
+                clicks=3;
+            }
+
+            if(board.getBoard()[mouse_y][mouse_x]== piece.BLACK)
+            {
+                System.out.println("invalid click");
+                if(board.getBoard()[mouse_y][mouse_x]== piece.BLACK)
+                {
+                    clicks = 0;
+                }
+            }
+        }
+
+        if (clicks > 2)
+        {
+            clicks=0;
+            player++;
+        }
+
+        if(player==2)
+        {
+
+            System.out.println("\n                    player 2                                    \n");
+            if(board.getBoard()[mouse_y][mouse_x]==piece.BLACK && clicks==1)
+            {
+                clicks--;
+                System.out.println("click: "+clicks);
+                board.update((mouse_x), (mouse_y));
+                old_click_x=mouse_x;
+                old_click_y=mouse_y;
+            }
+
+            if(board.getBoard()[mouse_y][mouse_x]==NULL && board.getBoard()[old_click_y][old_click_x]==piece.BLACK)
+            {
+                System.out.println("click: "+clicks);
+                board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
+                clicks=3;
+            }
+
+            if(board.getBoard()[mouse_y][mouse_x]== piece.WHITE)
+            {
+                System.out.println("invalid click");
+                if(board.getBoard()[mouse_y][mouse_x]== piece.WHITE)
+                {
+                    clicks = 0;
+                }
+            }
+
+            if (clicks > 2)
+            {
+                clicks=0;
+                player++;
+            }
+        }
+
+
+
+
     }
     public void mouseDragged(MouseEvent e)
     {}
@@ -76,7 +161,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     public void paintComponent(Graphics g)
     {
         Graphics2D g2d = (Graphics2D) g;
-        gameSet.paint(g);
+        board.paint(g);
         g2d.dispose();
     }
 
@@ -122,6 +207,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void update()
     {
+
         x++;
     }
 
