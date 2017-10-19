@@ -51,7 +51,8 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
             if(board.getBoard()[mouse_y][mouse_x]==piece.WHITE && clicks==1)
             {
                 clicks--;
-                board.update((mouse_x), (mouse_y));
+                board.setClicks();
+                board.update(mouse_x,mouse_y);
                 old_click_x=mouse_x;
                 old_click_y=mouse_y;
             }
@@ -59,7 +60,9 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
             if(board.getBoard()[mouse_y][mouse_x]==NULL && board.getBoard()[old_click_y][old_click_x]==piece.WHITE)
             {
                 System.out.println("click: "+clicks);
+                board.setClicks();
                 board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
+                board.update(mouse_x,mouse_y);
                 clicks=3;
             }
 
@@ -81,11 +84,11 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
         if(player==2)
         {
-
             System.out.println("\n                    player 2                                    \n");
             if(board.getBoard()[mouse_y][mouse_x]==piece.BLACK && clicks==1)
             {
                 clicks--;
+                board.setClicks();
                 System.out.println("click: "+clicks);
                 board.update((mouse_x), (mouse_y));
                 old_click_x=mouse_x;
@@ -120,13 +123,17 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     }
     public void mouseDragged(MouseEvent e)
-    {}
+    {
+        mouseClicked(e);
+    }
     public void mouseMoved(MouseEvent e)
     {
-       // System.out.println(mouse_x+ ", "+mouse_y);
     }
 
-    private void setMousePosition(MouseEvent e){}
+    private void setMousePosition(MouseEvent e)
+    {
+      //setMousePosition();
+    }
 
     public void mousePressed(MouseEvent e) {}
 
