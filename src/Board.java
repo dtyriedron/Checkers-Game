@@ -14,8 +14,8 @@ public class Board
     public static boolean isOccupied = false;
     public static boolean ishighlighted =false;
 
-    public int old_click_x=40;
-    public int old_click_y=40;
+    public int old_click_x=8;
+    public int old_click_y=8;
     public int xmod=0;
     public int ymod=0;
 
@@ -284,7 +284,6 @@ public class Board
         {
             if (x+1==old_x && y-1==old_y&& board[old_y][old_x]==piece.BLACK&& (board[y][x]==piece.WHITE|| board[y][x]==NULL))
             {
-                System.out.println("\n black left");
                 isoldblack=true;
                 removeChecker(old_x,old_y);
                 addChecker(x,y);
@@ -297,7 +296,6 @@ public class Board
         {
             if(x-1==old_x && y-1==old_y && board[old_y][old_x]==piece.BLACK &&  board[y][x]==NULL)
             {
-                System.out.println("\n black right");
                 isoldblack=true;
                 removeChecker(old_x,old_y);
                 addChecker(x,y);
@@ -309,7 +307,6 @@ public class Board
         {
             if (x+2==old_x && y-2==old_y&& board[old_y][old_x]==piece.BLACK&& (board[y+1][x-1]==piece.WHITE|| board[y][x]==NULL))
             {
-                System.out.println("\n black take left");
                 blackcantakeleft=true;
                 isoldblack=true;
                 removeChecker(old_x,old_y);
@@ -324,7 +321,6 @@ public class Board
         {
             if(x-2==old_x && y-2==old_y && board[old_y][old_x]==piece.BLACK && (board[y-1][x-1]==piece.WHITE|| board[y][x]==NULL))
             {
-                System.out.println("\n black take right");
                 blackcantakeright=true;
                 isoldblack=true;
                 removeChecker(old_x,old_y);
@@ -339,7 +335,6 @@ public class Board
         {
                 if(x+1==old_x && y+1==old_y && board[old_y][old_x]==piece.WHITE && (board[y][x]==piece.BLACK || board[y][x]==NULL))
                 {
-                    System.out.println("\n white left");
                     isoldwhite=true;
                     removeChecker(old_x,old_y);
                     addChecker(x,y);
@@ -353,7 +348,6 @@ public class Board
         {
             if(x-1==old_x && y+1==old_y && board[old_y][old_x]==piece.WHITE&&(board[y][x]==piece.BLACK|| board[y][x]==NULL))
             {
-                System.out.println("\n white right");
                 isoldwhite=true;
                 removeChecker(old_x,old_y);
                 addChecker(x,y);
@@ -366,7 +360,6 @@ public class Board
         {
             if(x+2==old_x && y+2==old_y && board[old_y][old_x]==piece.WHITE&&(board[y+1][x+1]==piece.BLACK|| board[y][x]==NULL))
             {
-                System.out.println("\n white take left");
                 whitecantakeleft=true;
                 isoldwhite=true;
                 removeChecker(old_x,old_y);
@@ -383,7 +376,6 @@ public class Board
             if(x-2==old_x && y+2==old_y && board[old_y][old_x]==piece.WHITE && (board[y+1][x-1]==piece.BLACK || board[y][x]==NULL))
             {
                 whitecantakeright=true;
-                System.out.println("\n white take right");
                 isoldwhite=true;
                 removeChecker(old_x,old_y);
                 addChecker(x,y);
