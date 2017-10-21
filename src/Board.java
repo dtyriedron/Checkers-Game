@@ -183,7 +183,7 @@ public class Board
                         }
                         if (blackcanmoveleftdia)
                         {
-                            if ((highlightX - 2) >= 0)
+                            if ((highlightX - 2) >= 0 && highlightY+2<BOARD_SIZE)
                             {
                                 g2d.fillRect((highlightX - 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
                             }
@@ -193,28 +193,28 @@ public class Board
                     {
                         if (whitecanmoveright)
                         {
-                            if ((highlightX + 1) < BOARD_SIZE)
+                            if ((highlightX + 1) < BOARD_SIZE && highlightY+2<BOARD_SIZE)
                             {
                                 g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
                             }
                         }
                         if (whitecanmoveleft)
                         {
-                            if ((highlightX - 1) >= 0)
+                            if ((highlightX - 1) >= 0 && highlightY-1<BOARD_SIZE)
                             {
                                 g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
                             }
                         }
                         if (whitecanmoveleftdia)
                         {
-                            if ((highlightX - 2) >= 0)
+                            if ((highlightX - 2) >=0 && highlightY-2<BOARD_SIZE)
                             {
                                 g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
                             }
                         }
                         if (whitecanmoverightdia)
                         {
-                            if ((highlightX + 2) >= 0)
+                            if ((highlightX + 2) <BOARD_SIZE && highlightY-2 <BOARD_SIZE)
                             {
                                 g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
                             }
@@ -337,7 +337,7 @@ public class Board
         //white can move left
         try
         {
-                if(x+1==old_x && y+1==old_y && board[old_y][old_x]==piece.WHITE && (board[y-1][x-1]==piece.BLACK || board[y][x]==NULL))
+                if(x+1==old_x && y+1==old_y && board[old_y][old_x]==piece.WHITE && (board[y][x]==piece.BLACK || board[y][x]==NULL))
                 {
                     System.out.println("\n white left");
                     isoldwhite=true;
@@ -484,7 +484,7 @@ public class Board
             }
             else
             {
-                whitecanmoveleft=false;
+                whitecanmoveright=false;
             }
         }catch(ArrayIndexOutOfBoundsException e){}
 
@@ -499,7 +499,7 @@ public class Board
             }
             else
             {
-                whitecanmoveright=false;
+                whitecanmoveleft=false;
             }
         }catch(ArrayIndexOutOfBoundsException e){}
 
@@ -534,10 +534,6 @@ public class Board
     {
         return board;
     }
-
-
-    //|| (board[highlightY - 1][highlightX - 1] == piece.BLACK && board[highlightY - 2][highlightX - 2] == NULL)
-    //board[highlightY][highlightX]== NULL || board[highlightY][highlightX] != NULL
 }
 
 
