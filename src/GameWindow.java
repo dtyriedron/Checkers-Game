@@ -38,20 +38,25 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         mouse_x = e.getX()/60;
         mouse_y = e.getY()/60;
         board.highlight(mouse_x,mouse_y);
-        clicks++;
 
-        try
+        if(board.getBoard()[mouse_y][mouse_x]==NULL)
         {
-            if(board.getBoard()[old_click_y][old_click_x]>board.BOARD_SIZE)
-            {
-                System.out.println("click: "+clicks);
-                clicks=0;
-            }
-        }catch(Exception f){}
+            clicks--;
+        }
+
         if(player>2)
         {
             player = 1;
         }
+
+        if (clicks > 2)
+        {
+            clicks=0;
+            System.out.println("old x: "+old_click_x);
+            player++;
+        }
+
+        clicks++;
 
         if(player==1)
         {
@@ -65,15 +70,14 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
                 old_click_y=mouse_y;
             }
 
-            try {
-
-
-                if (board.getBoard()[mouse_y][mouse_x] == NULL && board.getBoard()[old_click_y][old_click_x] == piece.WHITE && clicks == 2) {
-                    System.out.println("click: " + clicks);
+            try
+            {
+                if (board.getBoard()[mouse_y][mouse_x] == NULL && board.getBoard()[old_click_y][old_click_x] == piece.WHITE)
+                {
                     board.setClicks();
                     board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
                     board.update(mouse_x, mouse_y);
-                    clicks = 3;
+                    clicks = 4;
                 }
             }catch(Exception f){}
 
@@ -82,13 +86,6 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
                 System.out.println("invalid click");
                 clicks = 0;
             }
-        }
-
-        if (clicks > 2)
-        {
-            clicks=0;
-            System.out.println("old x: "+old_click_x);
-            player++;
         }
 
         if(player==2)
@@ -105,7 +102,8 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
             }
 
             try {
-                if (board.getBoard()[mouse_y][mouse_x] == NULL && board.getBoard()[old_click_y][old_click_x] == piece.BLACK && clicks == 2) {
+                if (board.getBoard()[mouse_y][mouse_x] == NULL && board.getBoard()[old_click_y][old_click_x] == piece.BLACK)
+                {
                     System.out.println("click: " + clicks);
                     board.setClicks();
                     board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
