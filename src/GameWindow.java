@@ -39,6 +39,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         mouse_y = e.getY()/60;
         board.highlight(mouse_x,mouse_y);
 
+
         if(board.getBoard()[mouse_y][mouse_x]==NULL)
         {
             clicks--;

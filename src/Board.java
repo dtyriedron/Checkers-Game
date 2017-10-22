@@ -1,3 +1,5 @@
+import com.sun.javafx.scene.paint.GradientUtils;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -11,7 +13,7 @@ public class Board
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
     public static boolean isRemoved = false;
-    public static boolean isOccupied = false;
+    public static boolean ISOCCUPIED = false;
     public static boolean ishighlighted =false;
 
     public int old_click_x=8;
@@ -46,7 +48,8 @@ public class Board
 
     //size of the Board
     static final int BOARD_SIZE = 8;
-    public int row = 0;
+    public static int ROW = 0;
+    public static int COL =0;
 
     //array to store checkers
     private int[][] board;
@@ -63,31 +66,34 @@ public class Board
          clicks=0;
     }
 
-    private void installCheckers()
+    public void installCheckers()
     {
-        for (row = 0; row < BOARD_SIZE; row += 2)
+        for (ROW = 0; ROW < BOARD_SIZE; ROW += 2)
         {
-            board[0][row] = piece.BLACK;
-            board[2][row] = piece.BLACK;
-            board[6][row] = piece.WHITE;
+            board[0][ROW] = piece.BLACK;
+            board[2][ROW] = piece.BLACK;
+            board[6][ROW] = piece.WHITE;
         }
-        for (row = 1; row < BOARD_SIZE; row += 2) {
-            board[1][row] = piece.BLACK;
-            board[5][row] = piece.WHITE;
-            board[7][row] = piece.WHITE;
+        for (ROW = 1; ROW < BOARD_SIZE; ROW += 2) {
+            board[1][ROW] = piece.BLACK;
+            board[5][ROW] = piece.WHITE;
+            board[7][ROW] = piece.WHITE;
         }
     }
 
+    private Move move = new Move();
     public void update(int x, int y)
     {
-        getPos(x,y);
+        move.checkCheckers();
+        setPos(x,y);
     }
 
-    public void getPos(int x, int y)
+    public void setPos(int x, int y)
     {
         this.highlightX = x;
         this.highlightY = y;
     }
+
     public void highlight(int x, int y)
     {
         ishighlighted=true;
@@ -95,11 +101,11 @@ public class Board
         {
             if(board[y][x] !=NULL)
             {
-                isOccupied=true;
+                ISOCCUPIED=true;
             }
             else
             {
-                isOccupied=false;
+                ISOCCUPIED=false;
             }
         }
         catch(ArrayIndexOutOfBoundsException e){}
