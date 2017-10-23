@@ -42,7 +42,7 @@ public class Board
 
     public int clicks=0;
 
-
+    private Move move;
 
     private int highlightX, highlightY;
 
@@ -58,6 +58,7 @@ public class Board
     {
         //store the Board into a 2d array
         board = new int [BOARD_SIZE][BOARD_SIZE];
+        move = new Move(this);
         installCheckers();
     }
 
@@ -81,10 +82,9 @@ public class Board
         }
     }
 
-    private Move move = new Move();
+
     public void update(int x, int y)
     {
-        move.checkCheckers();
         setPos(x,y);
     }
 
@@ -97,6 +97,7 @@ public class Board
     public void highlight(int x, int y)
     {
         ishighlighted=true;
+        System.out.println("col: "+y+ " row: "+x);
         try
         {
             if(board[y][x] !=NULL)
@@ -162,71 +163,145 @@ public class Board
             {
                 try
                 {
-                    validMove(highlightX, highlightY);
-                    if (isblack)
+                    //if black can move right
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX+1,highlightY+1)))
                     {
-                        if (blackcanmoveright)
+                        if (((highlightX + 1) >= 0 && (highlightX + 1) < BOARD_SIZE) && ((highlightY + 1) < BOARD_SIZE))
                         {
-                            //make sure it doesent paint outside the board
-                            if (((highlightX + 1) >= 0 && (highlightX + 1) < BOARD_SIZE) && ((highlightY + 1) < BOARD_SIZE))
-                            {
-                                g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
-                            }
-                        }
-                        if (blackcanmoveleft)
-                        {
-                            if ((highlightX - 1) >= 0 && highlightY + 1 < BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
-                            }
-                        }
-                        if (blackcanmoverightdia)
-                        {
-                            if ((highlightX + 2) < BOARD_SIZE && highlightY + 2 < BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX + 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
-                            }
-                        }
-                        if (blackcanmoveleftdia)
-                        {
-                            if ((highlightX - 2) >= 0 && highlightY+2<BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX - 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
-                            }
+                            g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
                         }
                     }
-                    if (iswhite)
+
+                    //if black can move left
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX-1, highlightY+1)))
                     {
-                        if (whitecanmoveright)
+                        if ((highlightX - 1) >= 0 && highlightY + 1 < BOARD_SIZE)
                         {
-                            if ((highlightX + 1) < BOARD_SIZE && highlightY+2<BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
-                            }
-                        }
-                        if (whitecanmoveleft)
-                        {
-                            if ((highlightX - 1) >= 0 && highlightY-1<BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
-                            }
-                        }
-                        if (whitecanmoveleftdia)
-                        {
-                            if ((highlightX - 2) >=0 && highlightY-2<BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-                            }
-                        }
-                        if (whitecanmoverightdia)
-                        {
-                            if ((highlightX + 2) <BOARD_SIZE && highlightY-2 <BOARD_SIZE)
-                            {
-                                g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-                            }
+                            g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
                         }
                     }
-                } catch (ArrayIndexOutOfBoundsException e) {}
+
+                    //if black can take white on the right
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX+2, highlightY+2)))
+                    {
+                        if ((highlightX + 2) < BOARD_SIZE && highlightY + 2 < BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX + 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
+                        }
+                    }
+
+                    //if black can take white on the left
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX-2,highlightY+2)))
+                    {
+                        if ((highlightX - 2) >=0 && highlightY-2<BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
+                        }
+                    }
+
+                    //if white can move right
+                    if(move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX+1, highlightY-1)))
+                    {
+                        if ((highlightX + 1) < BOARD_SIZE && highlightY+2<BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+                        }
+                    }
+
+                    //if white can move left
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX-1,highlightY-1)))
+                    {
+                        if ((highlightX - 1) >= 0 && highlightY-1<BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+                        }
+                    }
+
+                    //if white can take right
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX+2,highlightY-2)))
+                    {
+                        if ((highlightX + 2) <BOARD_SIZE && highlightY-2 <BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
+                        }
+                    }
+
+                    //if white can take left
+                    if(move.isValidMove(new Point(highlightX,highlightY), new Point(highlightX-2,highlightY-2)))
+                    {
+                        if ((highlightX + 2) <BOARD_SIZE && highlightY-2 <BOARD_SIZE)
+                        {
+                            g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
+                        }
+                    }
+                }catch (ArrayIndexOutOfBoundsException e){}
+//                try
+//                {
+//                    validMove(highlightX, highlightY);
+//                    if (isblack)
+//                    {
+//                        if (blackcanmoveright)
+//                        {
+//                            //make sure it doesent paint outside the board
+//                            if (((highlightX + 1) >= 0 && (highlightX + 1) < BOARD_SIZE) && ((highlightY + 1) < BOARD_SIZE))
+//                            {
+//                                g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                        if (blackcanmoveleft)
+//                        {
+//                            if ((highlightX - 1) >= 0 && highlightY + 1 < BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                        if (blackcanmoverightdia)
+//                        {
+//                            if ((highlightX + 2) < BOARD_SIZE && highlightY + 2 < BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX + 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                        if (blackcanmoveleftdia)
+//                        {
+//                            if ((highlightX - 2) >= 0 && highlightY+2<BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX - 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                    }
+//                    if (iswhite)
+//                    {
+//                        if (whitecanmoveright)
+//                        {
+//                            if ((highlightX + 1) < BOARD_SIZE && highlightY+2<BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                        if (whitecanmoveleft)
+//                        {
+//                            if ((highlightX - 1) >= 0 && highlightY-1<BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                        if (whitecanmoveleftdia)
+//                        {
+//                            if ((highlightX - 2) >=0 && highlightY-2<BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                        if (whitecanmoverightdia)
+//                        {
+//                            if ((highlightX + 2) <BOARD_SIZE && highlightY-2 <BOARD_SIZE)
+//                            {
+//                                g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
+//                            }
+//                        }
+//                    }
+//                } catch (ArrayIndexOutOfBoundsException e) {}
 
             }
         }

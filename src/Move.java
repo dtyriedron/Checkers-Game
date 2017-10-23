@@ -1,35 +1,105 @@
+import com.sun.corba.se.impl.oa.NullServantImpl;
+import com.sun.management.VMOption;
+
 import javax.swing.*;
-import java.util.HashMap;
-import java.util.Map;
 
 import static java.sql.Types.NULL;
 
 
 public class Move extends JPanel
 {
-    //determine whether the piece can move
-    //determine whether the piece can take an opposing piece
-    //determine whether the piece has moved to the end of the Board
-    //determine if the piece is a king
+    //determine whether the Piece can move
+    //determine whether the Piece can take an opposing Piece
+    //determine whether the Piece has moved to the end of the Board
+    //determine if the Piece is a king
 
-    Map potmoves = new HashMap();
-
-    public Move()
+    private Board board;
+    private Piece piece;
+    public Move(Board b)
     {
+        this.board = b;
     }
 
-    public void checkCheckers()
+    public boolean isValidMove(Point origin, Point dest)
     {
-        Board board = new Board();
-        if(board.ISOCCUPIED)
+        if(board.getBoard()[origin.getCol()][origin.getRow()] == Piece.WHITE && (board.getBoard()[dest.getCol()][dest.getRow()] == NULL))
         {
-            for(int i=0; i<board.BOARD_SIZE*2; i++)
+            //check if the white Piece can go right
+            if (dest.getCol() == origin.getCol() - 1 && dest.getRow() == origin.getRow() + 1)
             {
-               // potmoves.put(new Point(,), i);
+                return true;
+            }
+            //check if the white Piece can go left
+            else if (dest.getCol() == origin.getCol() - 1 && dest.getRow() == origin.getRow() - 1)
+            {
+                return true;
+            }
+
+            //check if any Piece can be taken
+            else if (board.getBoard()[origin.getCol() - 1][origin.getRow() + 1] == Piece.BLACK || board.getBoard()[origin.getCol() - 1][origin.getRow() - 1] == Piece.BLACK)
+            {
+                //check if the white Piece can take right
+                if (dest.getCol() == origin.getCol() - 2 && dest.getRow() == origin.getRow() + 2)
+                {
+                    return true;
+                }
+                //check if the white Piece can take left
+                else if (dest.getCol() == origin.getCol() - 2 && dest.getRow() == origin.getRow() - 2)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
-        System.out.println("check pos: "+potmoves);
+        
+        else if(board.getBoard()[origin.getCol()][origin.getRow()] == Piece.BLACK && (board.getBoard()[dest.getCol()][dest.getRow()] == NULL))
+        {
+                //check if the black Piece can go right
+                if (dest.getCol() == origin.getCol()+1 && dest.getRow() == origin.getRow()+1)
+                {
+                    return true;
+                }
+                //check if the black Piece can go left
+                else if(dest.getCol() == origin.getCol()+1 && dest.getRow() == origin.getRow()-1)
+                {
+                    return true;
+                }
+                //check if any jumps can be done
+                else if(board.getBoard()[origin.getCol()+1][origin.getRow()+1]==Piece.WHITE || board.getBoard()[origin.getCol()+1][origin.getRow()-1] == Piece.WHITE)
+                {
+                    //check if the black Piece can take right
+                    if (dest.getCol() == origin.getCol()-2 && dest.getRow() == origin.getRow()+2)
+                    {
+                        return true;
+                    }
+                    //check if the black Piece can take left
+                    else if (dest.getCol() == origin.getCol()-2 && dest.getRow() == origin.getRow()-2)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+                else
+                {
+                    return false;
+                }
+        }
+        else
+        {
+            return true;
+        }
     }
+
     private void validmove()
     {
 
