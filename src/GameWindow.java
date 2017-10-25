@@ -2,29 +2,28 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-import static java.sql.Types.NULL;
 
 public class GameWindow extends JPanel implements MouseListener, MouseMotionListener, Runnable
 {
-    public static final int WIDTH = 400;
-    public static final int HEIGHT = 400;
+    private static final int WIDTH = 400;
+    private static final int HEIGHT = 400;
     private Board board = new Board();
-    public static int player = 1;
-    private Piece piece = new Piece();
-    public int clicks=0;
+    private static int player = 1;
+    private Piece piece;
+    private int clicks=0;
 
     //game loop fields
     private Thread thread;
     private int FPS=30;
     private long targetTime = 1000/FPS;
-    public boolean isRunning = false;
+    private boolean isRunning = false;
 
     //mouse position
-    public static int mouse_x, mouse_y;
-    public int old_click_x=40;
-    public int old_click_y=40;
+    private static int mouse_x, mouse_y;
+    private int old_click_x=40;
+    private int old_click_y=40;
 
-    public GameWindow()
+    private GameWindow()
     {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
@@ -33,105 +32,24 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         start();
     }
 
-    public void mouseClicked (MouseEvent e)
+    public void mousePressed(MouseEvent e)
     {
-        mouse_x = e.getX()/60;
-        mouse_y = e.getY()/60;
-        board.highlight(mouse_x,mouse_y);
-
-
-        if(board.getBoard()[mouse_y][mouse_x]==NULL)
-        {
-            clicks--;
-        }
-
-        if(player>2)
-        {
-            player = 1;
-        }
-
-        if (clicks > 2)
-        {
-            clicks=0;
-            System.out.println("old x: "+old_click_x);
-            player++;
-        }
-
         clicks++;
+        if(clicks > 2)
+            clicks = 0;
 
-        if(player==1)
-        {
-            System.out.println("\n                    player 1                                    \n");
-            if(board.getBoard()[mouse_y][mouse_x]==piece.WHITE && clicks==1)
-            {
-                clicks--;
-                board.setClicks();
-                board.update(mouse_x,mouse_y);
-                old_click_x=mouse_x;
-                old_click_y=mouse_y;
-            }
 
-            try
-            {
-                if (board.getBoard()[mouse_y][mouse_x] == NULL && board.getBoard()[old_click_y][old_click_x] == piece.WHITE)
-                {
-                    board.setClicks();
-                    board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
-                    board.update(mouse_x, mouse_y);
-                    clicks = 4;
-                }
-            }catch(Exception f){}
-
-            if(board.getBoard()[mouse_y][mouse_x]== piece.BLACK && (board.getBoard()[mouse_y][mouse_x]==NULL && clicks==1))
-            {
-                System.out.println("invalid click");
-                clicks = 0;
-            }
+        if(clicks == 1) {
+            board.highlightTile(e.getX() / 60, e.getY() / 60);
         }
 
-        if(player==2)
-        {
-            System.out.println("\n                    player 2                                    \n");
-            if(board.getBoard()[mouse_y][mouse_x]==piece.BLACK && clicks==1)
-            {
-                clicks--;
-                board.setClicks();
-                System.out.println("click: "+clicks);
-                board.update((mouse_x), (mouse_y));
-                old_click_x=mouse_x;
-                old_click_y=mouse_y;
-            }
-
-            try {
-                if (board.getBoard()[mouse_y][mouse_x] == NULL && board.getBoard()[old_click_y][old_click_x] == piece.BLACK)
-                {
-                    System.out.println("click: " + clicks);
-                    board.setClicks();
-                    board.isMoving(mouse_x, mouse_y, old_click_x, old_click_y);
-                    board.update(mouse_x, mouse_y);
-                    clicks = 3;
-                }
-            }catch(Exception f){}
-            if(board.getBoard()[mouse_y][mouse_x]== piece.WHITE)
-            {
-                System.out.println("invalid click");
-                    clicks = 0;
-            }
-
-            if (clicks > 2)
-            {
-                clicks=0;
-                player++;
-            }
+        if(clicks == 2) {
+            board.secondClick(e.getY() / 60, e.getX() / 60);
         }
-
-
-
 
     }
     public void mouseDragged(MouseEvent e)
     {
-        mouseClicked(e);
     }
     public void mouseMoved(MouseEvent e)
     {
@@ -142,7 +60,7 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
       //setMousePosition();
     }
 
-    public void mousePressed(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {}
 
     public void mouseReleased(MouseEvent e) {}
 

@@ -1,7 +1,8 @@
 public class Type
 {
-    public static final int NORMAL = 1;
-    public static final int KING = 2;
+    public static Type normal;
+    public static Type king;
     public Type()
-    {}
+    {
+    }
 }
