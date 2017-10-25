@@ -3,8 +3,6 @@ import java.awt.*;
 
 public class Board
 {
-    private Piece piece;
-
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
     public static boolean isRemoved = false;
@@ -78,7 +76,7 @@ public class Board
     }
 
 
-    public void update(int x, int y)
+    public void update()
     {
     }
 
@@ -86,35 +84,81 @@ public class Board
     {
         //ishighlighted=true;
         highlight = new Point(y, x);
-        //System.out.println(x + " " + y);
         old_row = y;
         old_col = x;
-        System.out.println(old_row + " " + old_col);
+        System.out.println(board[y][x].getType());
     }
 
-    public void secondClick(int row, int col) {
+    public void secondClick(int row, int col)
+    {
         new_row = row;
         new_col = col;
 
         System.out.println(row + " " + col);
 
-        //TODO check if move from old_row, old_col to new_row, new_col is valid!!
         checkMove(old_row, old_col, new_row, new_col);
     }
 
     private void checkMove(int row, int col, int destRow, int destCol) {
-        if(move.validMove(row, col, destRow, destCol)) {
-            move(row, col, destRow, destCol);
+            if(move.validMove(row, col, destRow, destCol))
+            {
+                move(row, col, destRow, destCol);
+                if(move.validKing(destRow))
+                board[destRow][destCol].setType(Type.king);
+            }
+            if(move.validJump(row, col, destRow, destCol))
+            {
+                move(row, col, destRow, destCol);
+                //check if white
+                if (destRow < row)
+                {
+                    //check if right
+                    if (destCol > col)
+                    {
+                        removeChecker(row - 1, col + 1);
+                    }
+                    //check if left
+                    else if (destCol < col)
+                    {
+                        removeChecker(row - 1, col - 1);
+                    }
+                }
+                //check if black
+                else if (destRow > row)
+                {
+                    //check if right
+                    if (destCol > col)
+                    {
+                        removeChecker(row + 1, col + 1);
+                    }
+                    //check if left
+                    else if (destCol < col)
+                    {
+                        removeChecker(row + 1, col - 1);
+                    }
+                }
+                if(move.validKing(destRow))
+                    board[destRow][destCol].setType(Type.king);
+            }
         }
-    }
 
-    private void move(int row, int col, int destRow, int destCol) {
-        board[destRow][destCol] = board[row][col];
+    private void removeChecker(int row, int col)
+    {
         board[row][col] = null;
     }
 
-    public Piece getChecker(int row, int col) {
-        return board[row][col];
+    private void move(int row, int col, int destRow, int destCol)
+    {
+        board[destRow][destCol] = board[row][col];
+        removeChecker(row, col);
+    }
+
+    public Piece getChecker(int row, int col)
+    {
+        if(validPos(row, col))
+            return board[row][col];
+
+        return null;
     }
 
     public boolean validPos(int x, int y)
@@ -148,19 +192,24 @@ public class Board
                 }
                 g2d.fillRect(x, y, WIDTH, HEIGHT);
 
-                if (board[i][j] != null && board[i][j].getColour() == Colour.WHITE)
+                if (board[i][j] != null && board[i][j].getColour() == Colour.WHITE && board[i][j].getType() == Type.normal)
                 {
                     g2d.setColor(Color.white);
                 }
-                else if (board[i][j] != null && board[i][j].getColour() == Colour.BLACK )
+                if (board[i][j] != null && board[i][j].getColour() == Colour.BLACK && board[i][j].getType() == Type.normal )
                 {
                     g2d.setColor(Color.DARK_GRAY);
+                }
+                if(board[i][j] != null && board[i][j].getType() == Type.king)
+                {
+                    g2d.setColor(Color.MAGENTA);
                 }
                 //increment the x so that there is a new square beside the last
 
                 g2d.fillOval(x + 10, y + 10, 3 * WIDTH / 4, 3 * HEIGHT / 4);
                 x += WIDTH;
             }
+
 
 //            if(board[y][x].getType() == Type.king)
 //            {
@@ -306,178 +355,178 @@ public class Board
 
     }
 
-    private void removeChecker(int x, int y)
-    {
+//    private void removeChecker(int x, int y)
+//    {
+//
+//        //black can take white to the right
+//        if(blackcantakeright)
+//        {
+//            board[y+1][x+1] = null;
+//        }
+//        //black can take white to the left
+//        if(blackcantakeleft)
+//        {
+//            board[y+1][x-1] = null;
+//        }
+//
+//        //white can take black to the right
+//        if(whitecantakeright)
+//        {
+//            board[y-1][x+1] = null;
+//        }
+//        //white can take black to the left
+//        if(whitecantakeleft)
+//        {
+//            board[y-1][x-1] = null;
+//        }
+//
+//        board[y][x] = null;
+//        if (board[y][x] == null)
+//        {
+//            isRemoved = true;
+//        }
+//        else
+//        {
+//            isRemoved = false;
+//        }
+//    }
+//    private void addChecker(int x, int y)
+//    {
+//        if(board[y][x] == null && isoldblack)
+//        {
+//            if(y==7)
+//            {
+//                board[y][x] = new Piece(Type.king, Colour.BLACK);
+//            }
+//            else
+//            {
+//                System.out.println("black piece added");
+//                board[y][x] = new Piece(Type.normal, Colour.BLACK);
+//            }
+//        }
+//        if(board[y][x] == null && isoldwhite)
+//        {
+//            if(y==7)
+//            {
+//                board[y][x] = new Piece(Type.king, Colour.WHITE);
+//            }
+//            else
+//            {
+//                System.out.println("white piece added");
+//                board[y][x] = new Piece(Type.normal, Colour.WHITE);
+//            }
+//        }
+//    }
 
-        //black can take white to the right
-        if(blackcantakeright)
-        {
-            board[y+1][x+1] = null;
-        }
-        //black can take white to the left
-        if(blackcantakeleft)
-        {
-            board[y+1][x-1] = null;
-        }
-
-        //white can take black to the right
-        if(whitecantakeright)
-        {
-            board[y-1][x+1] = null;
-        }
-        //white can take black to the left
-        if(whitecantakeleft)
-        {
-            board[y-1][x-1] = null;
-        }
-
-        board[y][x] = null;
-        if (board[y][x] == null)
-        {
-            isRemoved = true;
-        }
-        else
-        {
-            isRemoved = false;
-        }
-    }
-    private void addChecker(int x, int y)
-    {
-        if(board[y][x] == null && isoldblack)
-        {
-            if(y==7)
-            {
-                board[y][x] = new Piece(Type.king, Colour.BLACK);
-            }
-            else
-            {
-                System.out.println("black piece added");
-                board[y][x] = new Piece(Type.normal, Colour.BLACK);
-            }
-        }
-        if(board[y][x] == null && isoldwhite)
-        {
-            if(y==7)
-            {
-                board[y][x] = new Piece(Type.king, Colour.WHITE);
-            }
-            else
-            {
-                System.out.println("white piece added");
-                board[y][x] = new Piece(Type.normal, Colour.WHITE);
-            }
-        }
-    }
-
-    public void isMoving(int x, int y, int old_x, int old_y)
-    {
-        System.out.println("x: "+x+" y: "+y);
-        System.out.println("old x: "+old_x+ " old y: "+old_y);
-        clicks=1;
-        //black can move left
-        try
-        {
-            if (old_x-1 == x && old_y+1 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[y][x] == null))
-            {
-                isoldblack=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                isoldblack=false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-
-        //black can move right
-        try
-        {
-            if(old_x+1 == x && old_y+1 == y && board[old_y][old_x].getColour() == Colour.BLACK &&  board[y][x] == null)
-            {
-                isoldblack=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                isoldblack =false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-        //black can take left
-        try
-        {
-            if (old_x-2 == x && old_y+2 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[old_y+1][old_x-1].getColour() == Colour.WHITE && board[y][x] == null))
-            {
-                blackcantakeleft=true;
-                isoldblack=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                blackcantakeleft=false;
-                isoldblack=false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-
-        //black can take right
-        try
-        {
-            if(old_x+2 == x && old_y+2 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[old_y+1][old_x+1].getColour() == Colour.WHITE && board[y][x] == null))
-            {
-                blackcantakeright=true;
-                isoldblack=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                blackcantakeright=false;
-                isoldblack =false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-
-        //white can move left
-        try
-        {
-            if(old_x-1 == x && old_y-1 == y && board[old_y][old_x].getColour() == Colour.WHITE && board[y][x] == null)
-            {
-                isoldwhite=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                isoldwhite=false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-
-        //white can move right
-        try
-        {
-            if(old_x+1 == x && old_y-1 == y && board[old_y][old_x].getColour() == Colour.WHITE && board[y][x] == null)
-            {
-                isoldwhite=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                isoldwhite=false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-
-        //white can take left
-        try
-        {
-            if(old_x-2 == x && old_y-2 == y && board[old_y][old_x].getColour() == Colour.WHITE && (board[old_y-1][old_x-1].getColour() == Colour.BLACK && board[y][x] == null))
-            {
-                whitecantakeleft=true;
-                isoldwhite=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                whitecantakeleft=false;
-                isoldwhite=false;
-            }
-
-        }catch(ArrayIndexOutOfBoundsException e){}
-
-        //white can take right
-        try
-        {
-            if(old_x+2 == x && old_y-2 == y && board[old_y][old_x].getColour() == Colour.WHITE && (board[old_y-1][old_x+1].getColour() == Colour.BLACK && board[y][x] == null))
-            {
-                whitecantakeright=true;
-                isoldwhite=true;
-                removeChecker(old_x,old_y);
-                addChecker(x,y);
-                whitecantakeright=false;
-                isoldwhite=false;
-            }
-        }catch(ArrayIndexOutOfBoundsException e){}
-    }
+//    public void isMoving(int x, int y, int old_x, int old_y)
+//    {
+//        System.out.println("x: "+x+" y: "+y);
+//        System.out.println("old x: "+old_x+ " old y: "+old_y);
+//        clicks=1;
+//        //black can move left
+//        try
+//        {
+//            if (old_x-1 == x && old_y+1 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[y][x] == null))
+//            {
+//                isoldblack=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                isoldblack=false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//
+//        //black can move right
+//        try
+//        {
+//            if(old_x+1 == x && old_y+1 == y && board[old_y][old_x].getColour() == Colour.BLACK &&  board[y][x] == null)
+//            {
+//                isoldblack=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                isoldblack =false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//        //black can take left
+//        try
+//        {
+//            if (old_x-2 == x && old_y+2 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[old_y+1][old_x-1].getColour() == Colour.WHITE && board[y][x] == null))
+//            {
+//                blackcantakeleft=true;
+//                isoldblack=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                blackcantakeleft=false;
+//                isoldblack=false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//
+//        //black can take right
+//        try
+//        {
+//            if(old_x+2 == x && old_y+2 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[old_y+1][old_x+1].getColour() == Colour.WHITE && board[y][x] == null))
+//            {
+//                blackcantakeright=true;
+//                isoldblack=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                blackcantakeright=false;
+//                isoldblack =false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//
+//        //white can move left
+//        try
+//        {
+//            if(old_x-1 == x && old_y-1 == y && board[old_y][old_x].getColour() == Colour.WHITE && board[y][x] == null)
+//            {
+//                isoldwhite=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                isoldwhite=false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//
+//        //white can move right
+//        try
+//        {
+//            if(old_x+1 == x && old_y-1 == y && board[old_y][old_x].getColour() == Colour.WHITE && board[y][x] == null)
+//            {
+//                isoldwhite=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                isoldwhite=false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//
+//        //white can take left
+//        try
+//        {
+//            if(old_x-2 == x && old_y-2 == y && board[old_y][old_x].getColour() == Colour.WHITE && (board[old_y-1][old_x-1].getColour() == Colour.BLACK && board[y][x] == null))
+//            {
+//                whitecantakeleft=true;
+//                isoldwhite=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                whitecantakeleft=false;
+//                isoldwhite=false;
+//            }
+//
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//
+//        //white can take right
+//        try
+//        {
+//            if(old_x+2 == x && old_y-2 == y && board[old_y][old_x].getColour() == Colour.WHITE && (board[old_y-1][old_x+1].getColour() == Colour.BLACK && board[y][x] == null))
+//            {
+//                whitecantakeright=true;
+//                isoldwhite=true;
+//                removeChecker(old_x,old_y);
+//                addChecker(x,y);
+//                whitecantakeright=false;
+//                isoldwhite=false;
+//            }
+//        }catch(ArrayIndexOutOfBoundsException e){}
+//    }
 
 //    public void validMove(int highlightX, int highlightY)
 //    {
@@ -620,6 +669,8 @@ public class Board
     {
         return board;
     }
+
+
 }
 
 

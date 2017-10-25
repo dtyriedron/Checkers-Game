@@ -1,5 +1,14 @@
 public class Piece
 {
+    private Colour colour;
+    private Type type;
+
+    public Piece(Type t, Colour c)
+    {
+        this.type=t;
+        this.colour=c;
+    }
+
     public Type getType() {
         return type;
     }
@@ -16,14 +25,7 @@ public class Piece
         this.colour = colour;
     }
 
-    private Colour colour;
 
-    private Type type;
-    public Piece(Type t, Colour c)
-    {
-        this.type=t;
-        this.colour=c;
-    }
 
 
 }
