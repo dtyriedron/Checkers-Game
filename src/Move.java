@@ -115,26 +115,36 @@ public class Move extends JPanel
 
     public boolean validJump(int row, int col, int destRow, int destCol)
     {
-            if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.WHITE && board.getChecker(row ,col).getType() == Type.normal) {
-                if (board.getChecker(row - 1, col + 1) != null && board.getChecker(row - 1, col + 1).getColour() == Colour.BLACK && row - 2 == destRow && col + 2 == destCol && board.getChecker(row - 2, col + 2) == null) {
+
+            if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.WHITE) && (board.getChecker(row, col).getType() == Type.normal)))) {
+                if (board.getChecker(row - 1, col + 1) != null && board.getChecker(row - 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && row - 2 == destRow && col + 2 == destCol && board.getChecker(row - 2, col + 2) == null) {
                     return true;
-                } if (board.getChecker(row - 1, col - 1) != null && board.getChecker(row - 1, col - 1).getColour() == Colour.BLACK && row - 2 == destRow && col - 2 == destCol && board.getChecker(row - 2, col - 2) == null) {
-                    return true;
-                }
-            } else if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.BLACK && board.getChecker(row ,col).getType() == Type.normal) {
-                if (board.getChecker(row + 1, col + 1) != null && board.getChecker(row + 1, col + 1).getColour() == Colour.WHITE && row + 2 == destRow && col + 2 == destCol && board.getChecker(row + 2, col + 2) == null) {
-                    return true;
-                } if (board.getChecker(row + 1, col - 1) != null && board.getChecker(row + 1, col - 1).getColour() == Colour.WHITE && row + 2 == destRow && col - 2 == destCol && board.getChecker(row + 2, col - 2) == null) {
+                } if (board.getChecker(row - 1, col - 1) != null && board.getChecker(row - 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && row - 2 == destRow && col - 2 == destCol && board.getChecker(row - 2, col - 2) == null) {
                     return true;
                 }
             }
-            if(board.getChecker(row,col) != null && board.getChecker(row,col).getType() == Type.king)
-            {
-                if(board.getChecker(destRow, destCol) == null && ((row - 2 == destRow && col + 2 == destCol) || (row - 2 == destRow && col - 2 == destCol) || (row + 2 == destRow && col + 2 == destCol) || (row + 2 == destRow && col - 2 == destCol)))
+            if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.BLACK) && (board.getChecker(row, col).getType() == Type.normal)))) {
+                if (board.getChecker(row + 1, col + 1) != null && board.getChecker(row + 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && row + 2 == destRow && col + 2 == destCol && board.getChecker(row + 2, col + 2) == null) {
                     return true;
+                } if (board.getChecker(row + 1, col - 1) != null && board.getChecker(row + 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && row + 2 == destRow && col - 2 == destCol && board.getChecker(row + 2, col - 2) == null) {
+                    return true;
+                }
             }
+//            if(board.getChecker(row,col) != null && board.getChecker(row,col).getType() == Type.king)
+//            {
+//                if(board.getChecker(destRow, destCol) == null && ((row - 2 == destRow && col + 2 == destCol) || (row - 2 == destRow && col - 2 == destCol) || (row + 2 == destRow && col + 2 == destCol) || (row + 2 == destRow && col - 2 == destCol)))
+//                    return true;
+//            }
 
         return false;
+    }
+
+    public Colour oppositeColour(Colour c)
+    {
+        if(c == Colour.WHITE)
+            return Colour.BLACK;
+
+        return Colour.WHITE;
     }
 
     public boolean validKing(int destRow)
