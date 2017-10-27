@@ -35,9 +35,9 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     public void mousePressed(MouseEvent e)
     {
         clicks++;
-        if(clicks > 2)
-            clicks = 0;
 
+        if(clicks > 2)
+            clicks = 1;
 
         if(clicks == 1) {
             board.highlightTile(e.getX() / 60, e.getY() / 60);
