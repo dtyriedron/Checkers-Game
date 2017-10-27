@@ -115,7 +115,6 @@ public class Move extends JPanel
 
     public boolean validJump(int row, int col, int destRow, int destCol)
     {
-
             if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.WHITE) && (board.getChecker(row, col).getType() == Type.normal)))) {
                 if (board.getChecker(row - 1, col + 1) != null && board.getChecker(row - 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && row - 2 == destRow && col + 2 == destCol && board.getChecker(row - 2, col + 2) == null) {
                     if(board.getChecker(row - 1,col + 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king)
@@ -162,24 +161,25 @@ public class Move extends JPanel
 
     public boolean validMove(int row, int col, int destRow, int destCol)
     {
-            if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.WHITE && board.getChecker(row ,col).getType() == Type.normal) {
+            if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.WHITE && board.getChecker(row, col).getType() == Type.normal) {
                 if (row - 1 == destRow && col + 1 == destCol && board.getChecker(row - 1, col + 1) == null && board.validPos(row - 1, col + 1)) {
                     return true;
-                } if (row - 1 == destRow && col - 1 == destCol && board.getChecker(row - 1, col - 1) == null && board.validPos(row - 1, col - 1)) {
+                }
+                if (row - 1 == destRow && col - 1 == destCol && board.getChecker(row - 1, col - 1) == null && board.validPos(row - 1, col - 1)) {
                     return true;
                 }
 
-            } else if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.BLACK && board.getChecker(row ,col).getType() == Type.normal) {
+            } else if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.BLACK && board.getChecker(row, col).getType() == Type.normal) {
                 if (row + 1 == destRow && col + 1 == destCol && board.getChecker(row + 1, col + 1) == null && board.validPos(row + 1, col + 1)) {
                     return true;
-                } if (row + 1 == destRow && col - 1 == destCol && board.getChecker(row + 1, col - 1) == null && board.validPos(row + 1, col - 1)) {
+                }
+                if (row + 1 == destRow && col - 1 == destCol && board.getChecker(row + 1, col - 1) == null && board.validPos(row + 1, col - 1)) {
                     return true;
                 }
             }
-            if(board.getChecker(row, col) != null && board.getChecker(row, col).getType() == Type.king)
-            {
-                if(board.getChecker(destRow, destCol) == null && ((row - 1 == destRow && col + 1 == destCol) || (row - 1 == destRow && col - 1 == destCol) || (row + 1 == destRow && col + 1 == destCol) || (row + 1 == destRow && col - 1 == destCol)))
-                return true;
+            if (board.getChecker(row, col) != null && board.getChecker(row, col).getType() == Type.king) {
+                if (board.getChecker(destRow, destCol) == null && ((row - 1 == destRow && col + 1 == destCol) || (row - 1 == destRow && col - 1 == destCol) || (row + 1 == destRow && col + 1 == destCol) || (row + 1 == destRow && col - 1 == destCol)))
+                    return true;
             }
         return false;
     }

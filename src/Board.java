@@ -13,6 +13,8 @@ public class Board
     public int old_col;
     public int new_row;
     public int new_col;
+    public int pot_row;
+    public int pot_col;
 
 
     public boolean isblack = false;
@@ -39,6 +41,10 @@ public class Board
 
     private Point highlight;
 
+    public int colourRow = 1;
+
+    public boolean couldjump = false;
+
     //size of the Board
     static final int BOARD_SIZE = 8;
     public static int ROW = 0;
@@ -46,10 +52,14 @@ public class Board
     //array to store checkers
     private Piece[][] board;
 
+    //array to store the points where a potential move can be made
+    private Point[] potMoves;
+
     public Board()
     {
         //store the Board into a 2d array
         board = new Piece [BOARD_SIZE][BOARD_SIZE];
+        potMoves = new Point[BOARD_SIZE];
         move = new Move(this);
         installCheckers();
     }
@@ -83,84 +93,134 @@ public class Board
     public void highlightTile(int x, int y)
     {
         //ishighlighted=true;
+        if(validPos(y,x))
         highlight = new Point(y, x);
         old_row = y;
         old_col = x;
+
+        pot_row = old_row;
+        pot_col = old_col;
+
+        if(getChecker(old_row, old_col) != null)
+        potMove(old_row, old_col, pot_row, pot_col);
     }
+
+    public void potMove(int old_row, int old_col, int pot_row, int pot_col)
+    {
+        if(getChecker(old_row, old_col).getColour() == Colour.WHITE && getChecker(old_row, old_col).getType() == Type.normal || getChecker(old_row, old_col).getType() == Type.king)
+            colourRow = -1;
+        else if(getChecker(old_row, old_col).getColour() == Colour.BLACK && getChecker(old_row, old_col).getType() == Type.normal || getChecker(old_row, old_col).getType() == Type.king)
+            colourRow = 1;
+
+        pot_row += colourRow;
+        pot_col++;
+        if (move.validMove(old_row, old_col, pot_row, pot_col))
+        {
+            if(validPos(pot_row, pot_col))
+            potMoves[0] = new Point(pot_row, pot_col);
+        System.out.println(potMoves[0].getRow() + " " + potMoves[0].getCol());
+        }
+        pot_col-=2;
+        if(move.validMove(old_row, old_col, pot_row, pot_col))
+            potMoves[1] = new Point(pot_row, pot_col);
+        pot_row += colourRow;
+        pot_col--;
+        if(move.validJump(old_row, old_col, pot_row, pot_col)) {
+            if(validPos(pot_row, pot_col)) {
+                couldjump = true;
+                potMoves[2] = new Point(pot_row, pot_col);
+            }
+        }
+        else {
+            pot_col += 4;
+            if (move.validJump(old_row, old_col, pot_row, pot_col)) {
+                if(validPos(pot_row, pot_col)) {
+                    couldjump = true;
+                    potMoves[3] = new Point(pot_row, pot_col);
+                }
+            }
+            else
+                couldjump = false;
+        }
+    }
+
 
     public void secondClick(int row, int col)
     {
         new_row = row;
         new_col = col;
-
         System.out.println(row + " " + col);
-
         checkMove(old_row, old_col, new_row, new_col);
     }
 
-    private void checkMove(int row, int col, int destRow, int destCol)
-    {
-        if(move.validMove(row, col, destRow, destCol))
+    private void checkMove(int row, int col, int destRow, int destCol) {
+        if(couldjump)
         {
-            move(row, col, destRow, destCol);
-            if(move.validKing(destRow))
-                board[destRow][destCol].setType(Type.king);
-        }
-
-        if(move.validJump(row, col, destRow, destCol))
-        {
-            //check if white
-            if (getChecker(row, col) != null && getChecker(row, col).getColour() == Colour.WHITE && getChecker(row, col).getType() == Type.normal)
+            if(move.validJump(row, col, destRow, destCol))
             {
-                if(destRow < row) {
-                    //check if right
-                    if (destCol > col) {
+                //check if white
+                if (getChecker(row, col) != null && getChecker(row, col).getColour() == Colour.WHITE && getChecker(row, col).getType() == Type.normal)
+                {
+                    if(destRow < row) {
+                        //check if right
+                        if (destCol > col) {
 
-                        if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == Colour.BLACK)
+                            if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == Colour.BLACK)
                                 removeChecker(row - 1, col + 1);
-                    }
-                    //check if left
-                    if(destCol < col) {
-                        if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == Colour.BLACK)
-                            removeChecker(row - 1, col - 1);
-                    }
-                }
-            }
-
-            //check if black
-            if (getChecker(row, col) != null && getChecker(row, col).getColour() == Colour.BLACK && getChecker(row, col).getType() == Type.normal)
-            {
-                if(destRow >= row) {
-                    //check if right
-                    if (destCol > col) {
-                        if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == Colour.WHITE)
-                            removeChecker(row + 1, col + 1);
-                    }
-                    if(destCol < col) {
+                        }
                         //check if left
-                        if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == Colour.WHITE)
-                            removeChecker(row + 1, col - 1);
+                        if(destCol < col) {
+                            if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == Colour.BLACK)
+                                removeChecker(row - 1, col - 1);
+                        }
                     }
                 }
-            }
 
-            //check if king
-            if(getChecker(row, col) != null && getChecker(row, col).getType() == Type.king)
-            {
-                if(getChecker(row, col).getColour() == Colour.WHITE)
+                //check if black
+                if (getChecker(row, col) != null && getChecker(row, col).getColour() == Colour.BLACK && getChecker(row, col).getType() == Type.normal)
                 {
-                    kingRemove(row, col, destRow, destCol, Colour.BLACK);
+                    if(destRow >= row) {
+                        //check if right
+                        if (destCol > col) {
+                            if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == Colour.WHITE)
+                                removeChecker(row + 1, col + 1);
+                        }
+                        if(destCol < col) {
+                            //check if left
+                            if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == Colour.WHITE)
+                                removeChecker(row + 1, col - 1);
+                        }
+                    }
                 }
-                else if(getChecker(row, col).getColour() == Colour.BLACK)
+
+                //check if king
+                if(getChecker(row, col) != null && getChecker(row, col).getType() == Type.king)
                 {
-                    kingRemove(row, col, destRow, destCol, Colour.WHITE);
+                    if(getChecker(row, col).getColour() == Colour.WHITE)
+                    {
+                        kingRemove(row, col, destRow, destCol, Colour.BLACK);
+                    }
+                    else if(getChecker(row, col).getColour() == Colour.BLACK)
+                    {
+                        kingRemove(row, col, destRow, destCol, Colour.WHITE);
+                    }
                 }
-            }
                 move(row, col, destRow, destCol);
-            if(move.validKing(destRow))
-                board[destRow][destCol].setType(Type.king);
+                if(move.validKing(destRow))
+                    board[destRow][destCol].setType(Type.king);
             }
         }
+        else
+        {
+            if(move.validMove(row, col, destRow, destCol)) {
+                move(row, col, destRow, destCol);
+                if (move.validKing(destRow))
+                    board[destRow][destCol].setType(Type.king);
+            }
+        }
+
+
+    }
 
     private void removeChecker(int row, int col)
     {
@@ -201,6 +261,7 @@ public class Board
     {
         board[destRow][destCol] = board[row][col];
         removeChecker(row, col);
+        potMoves = new Point[BOARD_SIZE];
     }
 
     public Piece getChecker(int row, int col)
@@ -259,6 +320,7 @@ public class Board
                 g2d.fillOval(x + 10, y + 10, 3 * WIDTH / 4, 3 * HEIGHT / 4);
                 x += WIDTH;
             }
+
 
 
 //            if(board[y][x].getType() == Type.king)
@@ -400,6 +462,13 @@ public class Board
             if(highlight != null) {
                 g2d.setColor(Color.orange);
                 g2d.drawRect(highlight.getCol() * 60, highlight.getRow() * 60, 60, 60);
+            }
+        }
+        for(int index = 0; index < potMoves.length; index++) {
+            if(potMoves[index] != null)
+            {
+                g2d.setColor(Color.yellow);
+                g2d.fillRect(potMoves[index].getCol() *60, potMoves[index].getRow() *60, WIDTH, HEIGHT);
             }
         }
 
