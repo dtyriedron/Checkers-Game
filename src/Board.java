@@ -117,7 +117,7 @@ public class Board
                     if (destCol > col) {
 
                         if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == Colour.BLACK)
-                            removeChecker(row - 1, col + 1);
+                                removeChecker(row - 1, col + 1);
                     }
                     //check if left
                     if(destCol < col) {
