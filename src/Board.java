@@ -41,7 +41,11 @@ public class Board
 
     private Point highlight;
 
+
     public int colourRow = 1;
+
+    public int kingrow = 2;
+
 
     public boolean couldjump = false;
 
@@ -98,45 +102,69 @@ public class Board
         old_row = y;
         old_col = x;
 
+        potMoves = new Point[BOARD_SIZE];
         pot_row = old_row;
         pot_col = old_col;
 
         if(getChecker(old_row, old_col) != null)
         potMove(old_row, old_col, pot_row, pot_col);
+
+
     }
 
     public void potMove(int old_row, int old_col, int pot_row, int pot_col)
     {
-        if(getChecker(old_row, old_col).getColour() == Colour.WHITE && getChecker(old_row, old_col).getType() == Type.normal || getChecker(old_row, old_col).getType() == Type.king)
+        if(getChecker(old_row, old_col).getColour() == Colour.WHITE && getChecker(old_row, old_col).getType() == Type.normal)
             colourRow = -1;
-        else if(getChecker(old_row, old_col).getColour() == Colour.BLACK && getChecker(old_row, old_col).getType() == Type.normal || getChecker(old_row, old_col).getType() == Type.king)
+        else if(getChecker(old_row, old_col).getColour() == Colour.BLACK && getChecker(old_row, old_col).getType() == Type.normal)
             colourRow = 1;
+
 
         pot_row += colourRow;
         pot_col++;
         if (move.validMove(old_row, old_col, pot_row, pot_col))
         {
-            if(validPos(pot_row, pot_col))
-            potMoves[0] = new Point(pot_row, pot_col);
-        System.out.println(potMoves[0].getRow() + " " + potMoves[0].getCol());
+            if(validPos(pot_row, pot_col)) {
+                potMoves = new Point[BOARD_SIZE];
+                potMoves[0] = new Point(pot_row, pot_col);
+            }
         }
         pot_col-=2;
         if(move.validMove(old_row, old_col, pot_row, pot_col))
-            potMoves[1] = new Point(pot_row, pot_col);
+            if(validPos(pot_row, pot_col)) {
+                potMoves[1] = new Point(pot_row, pot_col);
+            }
         pot_row += colourRow;
         pot_col--;
-        if(move.validJump(old_row, old_col, pot_row, pot_col)) {
-            if(validPos(pot_row, pot_col)) {
+        if(validPos(pot_row, pot_col))
+        {
+            System.out.println(couldjump);
+            if(move.validJump(old_row, old_col, pot_row, pot_col)) {
                 couldjump = true;
-                potMoves[2] = new Point(pot_row, pot_col);
+                potMoves = new Point[BOARD_SIZE];
+                potMoves[0] = new Point(pot_row, pot_col);
+//                if (getChecker(old_row, old_col).getType() == Type.king) {
+//                    if (colourRow == -1)
+//                        kingrow = 4;
+//                    else
+//                        kingrow = -4;
+//                    pot_row += kingrow;
+//                    if (validPos(pot_row, pot_col))
+//                        potMoves[potmovesindex++] = new Point(pot_row, pot_col);
+//                    pot_row -= kingrow;
+//                }
             }
+            else
+                couldjump = false;
         }
         else {
             pot_col += 4;
-            if (move.validJump(old_row, old_col, pot_row, pot_col)) {
-                if(validPos(pot_row, pot_col)) {
+
+            if (validPos(pot_row, pot_col)) {
+                System.out.println(couldjump);
+                if(move.validJump(old_row, old_col, pot_row, pot_col)) {
                     couldjump = true;
-                    potMoves[3] = new Point(pot_row, pot_col);
+                    potMoves[1] = new Point(pot_row, pot_col);
                 }
             }
             else
