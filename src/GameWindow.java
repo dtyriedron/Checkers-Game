@@ -3,7 +3,7 @@ import java.awt.event.*;
 import javax.swing.*;
 
 
-public class GameWindow extends JPanel implements MouseListener, MouseMotionListener, Runnable
+public class GameWindow extends JPanel implements ActionListener, MouseListener, MouseMotionListener, Runnable
 {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 400;
@@ -11,6 +11,8 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
     private static int player = 1;
     private Piece piece;
     private int clicks=0;
+
+    private JButton undo;
 
     //game loop fields
     private Thread thread;
@@ -29,7 +31,16 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
+
+        undo = new JButton(new ImageIcon(getClass().getResource("undo.png")));
+        undo.setBounds(500,500, 40, 40);
+        add(undo);
+        undo.addActionListener(this);
         start();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        board.undo();
     }
 
     public void mousePressed(MouseEvent e)
@@ -40,10 +51,12 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
             clicks = 1;
 
         if(clicks == 1) {
+            if(board.validPos(e.getX()/60,e.getY()/60))
             board.highlightTile(e.getX() / 60, e.getY() / 60);
         }
 
         if(clicks == 2) {
+           if(board.validPos(e.getX()/60,e.getY()/60))
             board.secondClick(e.getY() / 60, e.getX() / 60);
         }
 
@@ -139,7 +152,6 @@ public class GameWindow extends JPanel implements MouseListener, MouseMotionList
 
     public void update()
     {
-
         x++;
     }
 

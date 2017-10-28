@@ -63,7 +63,7 @@ public class Board
     //array to store the points where a potential move can be made
     private Point[] potMoves;
 
-    private Stack<PreviousMove> pastMoves;
+    private Stack<PreviousMove> pastMoves = new Stack<>();
 
     public Board()
     {
@@ -72,8 +72,8 @@ public class Board
         potMoves = new Point[BOARD_SIZE];
         move = new Move(this);
         installCheckers();
-        pastMoves = new Stack<PreviousMove>();
     }
+
 
     public void setClicks()
     {
@@ -182,10 +182,7 @@ public class Board
     {
         new_row = row;
         new_col = col;
-        System.out.println(row + " " + col);
         checkMove(old_row, old_col, new_row, new_col);
-        pastMoves.push(new PreviousMove(new Point(old_row, old_col), new Point(new_row, new_col)));
-        System.out.println(pastMoves.peek().getOrigin().getRow() + " " + pastMoves.peek().getOrigin().getCol());
     }
 
     private void checkMove(int row, int col, int destRow, int destCol) {
@@ -254,10 +251,21 @@ public class Board
             }
         }
 
-
     }
 
-    private void removeChecker(int row, int col)
+    public void addChecker(int row, int col, int destRow, int destCol){
+        if(getChecker(row, col).getColour() == Colour.WHITE)
+            if(getChecker(row, col).getType() == Type.normal)
+                board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
+            else
+                board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
+        else
+            if(getChecker(row, col).getType() == Type.normal)
+                board[destRow][destCol] = new Piece(Type.normal, Colour.BLACK);
+            else
+                board[destRow][destCol] = new Piece(Type.king, Colour.BLACK);
+    }
+    public void removeChecker(int row, int col)
     {
         board[row][col] = null;
     }
@@ -292,11 +300,31 @@ public class Board
         }
     }
 
-    private void move(int row, int col, int destRow, int destCol)
+    public void move(int row, int col, int destRow, int destCol)
     {
         board[destRow][destCol] = board[row][col];
         removeChecker(row, col);
         potMoves = new Point[BOARD_SIZE];
+
+        PreviousMove pm = new PreviousMove(new Point(old_row, old_col), new Point(new_row, new_col));
+        pastMoves.push(pm);
+        //System.out.println(pastMoves.peek().getOrigin().getRow());
+        System.out.println("moved from: "+pastMoves.peek().getOrigin().getRow() + ", " + pastMoves.peek().getOrigin().getCol() + " to: "+pastMoves.peek().getDest().getRow() + ", " + pastMoves.peek().getDest().getCol());
+    }
+
+    //if undo button pressed then pull from stack and then stored so it can be redone
+
+    public void undo()
+    {
+        System.out.println(pastMoves.empty());
+        if(!pastMoves.isEmpty()){
+            removeChecker(pastMoves.peek().getDest().getRow(), pastMoves.peek().getDest().getCol());
+            addChecker(pastMoves.peek().getDest().getRow(), pastMoves.peek().getDest().getCol(), pastMoves.peek().getOrigin().getRow(), pastMoves.peek().getOrigin().getCol());
+        }
+        else
+        {
+            System.out.println("not moves in 'ere");
+        }
     }
 
     public Piece getChecker(int row, int col)
@@ -823,6 +851,8 @@ public class Board
     {
         return board;
     }
+
+    public Stack getPastMoves(){return pastMoves;}
 
 
 }
