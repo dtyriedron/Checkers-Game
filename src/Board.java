@@ -1,4 +1,8 @@
 import java.awt.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Stack;
 
 
 public class Board
@@ -59,6 +63,8 @@ public class Board
     //array to store the points where a potential move can be made
     private Point[] potMoves;
 
+    private Stack<PreviousMove> pastMoves;
+
     public Board()
     {
         //store the Board into a 2d array
@@ -66,6 +72,7 @@ public class Board
         potMoves = new Point[BOARD_SIZE];
         move = new Move(this);
         installCheckers();
+        pastMoves = new Stack<PreviousMove>();
     }
 
     public void setClicks()
@@ -108,8 +115,6 @@ public class Board
 
         if(getChecker(old_row, old_col) != null)
         potMove(old_row, old_col, pot_row, pot_col);
-
-
     }
 
     public void potMove(int old_row, int old_col, int pot_row, int pot_col)
@@ -179,6 +184,8 @@ public class Board
         new_col = col;
         System.out.println(row + " " + col);
         checkMove(old_row, old_col, new_row, new_col);
+        pastMoves.push(new PreviousMove(new Point(old_row, old_col), new Point(new_row, new_col)));
+        System.out.println(pastMoves.peek().getOrigin().getRow() + " " + pastMoves.peek().getOrigin().getCol());
     }
 
     private void checkMove(int row, int col, int destRow, int destCol) {
