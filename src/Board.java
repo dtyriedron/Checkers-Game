@@ -1,8 +1,4 @@
 import java.awt.*;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Stack;
 
 
 public class Board
@@ -63,7 +59,8 @@ public class Board
     //array to store the points where a potential move can be made
     private Point[] potMoves;
 
-    private Stack<PreviousMove> pastMoves = new Stack<>();
+    //private PreviousMove[] pastMoves;
+    //private int pastmovesize = 5;
 
     public Board()
     {
@@ -71,6 +68,7 @@ public class Board
         board = new Piece [BOARD_SIZE][BOARD_SIZE];
         potMoves = new Point[BOARD_SIZE];
         move = new Move(this);
+        System.out.println("CONSTRUCTOR, initialising pastMoves");
         installCheckers();
     }
 
@@ -177,6 +175,12 @@ public class Board
         }
     }
 
+    //public PreviousMove peekPastMoves()
+//    {
+//        //PreviousMove firstMove = pastMoves[0];
+//        //PreviousMove lastMove = pastMoves[pastMoves.length-1];
+//        //return lastMove;
+//    }
 
     public void secondClick(int row, int col)
     {
@@ -255,7 +259,7 @@ public class Board
 
     public void addChecker(int row, int col, int destRow, int destCol){
         if(getChecker(row, col).getColour() == Colour.WHITE)
-            if(getChecker(row, col).getType() == Type.normal)
+            if (getChecker(row, col).getType() == Type.normal)
                 board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
             else
                 board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
@@ -300,32 +304,45 @@ public class Board
         }
     }
 
-    public void move(int row, int col, int destRow, int destCol)
+    private void move(int row, int col, int destRow, int destCol)
     {
         board[destRow][destCol] = board[row][col];
         removeChecker(row, col);
         potMoves = new Point[BOARD_SIZE];
 
         PreviousMove pm = new PreviousMove(new Point(old_row, old_col), new Point(new_row, new_col));
-        pastMoves.push(pm);
+//        Point po = new Point(old_row, old_col);
+//        Point pd = new Point(new_row, new_col);
+//        pm.setDest(pd);
+//        pm.setOrigin(po);
+        PastMoves.addMove(pm);
+
+        //System.out.println("STORING: " + pm.getDest().getRow() + pm.getDest().getCol() + "at index: " + pastmovesindex);
         //System.out.println(pastMoves.peek().getOrigin().getRow());
-        System.out.println("moved from: "+pastMoves.peek().getOrigin().getRow() + ", " + pastMoves.peek().getOrigin().getCol() + " to: "+pastMoves.peek().getDest().getRow() + ", " + pastMoves.peek().getDest().getCol());
+        //System.out.println("moved from: "+pastMoves.[pastmovesindex].getOrigin().getRow() + ", " + pastMoves.peek().getOrigin().getCol() + " to: "+pastMoves.peek().getDest().getRow() + ", " + pastMoves.peek().getDest().getCol());
     }
 
     //if undo button pressed then pull from stack and then stored so it can be redone
 
-    public void undo()
-    {
-        System.out.println(pastMoves.empty());
-        if(!pastMoves.isEmpty()){
-            removeChecker(pastMoves.peek().getDest().getRow(), pastMoves.peek().getDest().getCol());
-            addChecker(pastMoves.peek().getDest().getRow(), pastMoves.peek().getDest().getCol(), pastMoves.peek().getOrigin().getRow(), pastMoves.peek().getOrigin().getCol());
-        }
-        else
-        {
-            System.out.println("not moves in 'ere");
-        }
+    private void test(int row, int col, int destRow, int destCol) {
+        board[destRow][destCol] = board[row][col];
+        removeChecker(row, col);
     }
+
+    void undo()
+    {
+
+
+        //addChecker(PastMoves.getLast().getDest().getRow(), PastMoves.getLast().getDest().getCol(), PastMoves.getLast().getOrigin().getRow(), PastMoves.getLast().getOrigin().getCol());
+        //removeChecker(PastMoves.getLast().getDest().getRow(), PastMoves.getLast().getDest().getCol());
+
+//        else
+//        {
+//            System.out.println("not moves in 'ere");
+//
+//        }
+    }
+
 
     public Piece getChecker(int row, int col)
     {
@@ -852,7 +869,6 @@ public class Board
         return board;
     }
 
-    public Stack getPastMoves(){return pastMoves;}
 
 
 }

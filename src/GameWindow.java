@@ -40,7 +40,7 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
     }
 
     public void actionPerformed(ActionEvent e) {
-        board.undo();
+        Move.undoMove();
     }
 
     public void mousePressed(MouseEvent e)

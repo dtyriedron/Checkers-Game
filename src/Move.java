@@ -13,7 +13,7 @@ public class Move extends JPanel
     //determine whether the Piece has moved to the end of the Board
     //determine if the Piece is a king
 
-    private Board board;
+    private static Board board;
     private Piece piece;
     private Type type;
     public Move(Board b)
@@ -184,6 +184,15 @@ public class Move extends JPanel
         return false;
     }
 
+
+    public static void undoMove() {
+        System.out.println(PastMoves.getLast().getOrigin().getRow()+" "+ PastMoves.getLast().getOrigin().getCol());
+        PreviousMove pm = PastMoves.getLast();
+
+        board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
+        board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()] = null;
+
+    }
 
 
 
