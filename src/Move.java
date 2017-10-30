@@ -208,44 +208,47 @@ public class Move extends JPanel
 
 
     public static void undoMove() {
-        System.out.println(PastMoves.getLast().getOrigin().getRow()+" "+ PastMoves.getLast().getOrigin().getCol());
+        //System.out.println(PastMoves.getLast().getOrigin().getRow()+" "+ PastMoves.getLast().getOrigin().getCol());
         PreviousMove pm = PastMoves.getLast();
-        addChecker(pm);
+        //addChecker(pm);
+        board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
+        System.out.println(Board.removedPiece.getPoint().getRow()+ " "+ Board.removedPiece.getPoint().getCol());
+        board.getBoard()[Board.removedPiece.getPoint().getRow()][Board.removedPiece.getPoint().getCol()] = Board.removedPiece;
         board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()] = null;
-
     }
 
-    public static void addChecker(PreviousMove pm){
-        Piece origin = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
-        if(pm.getTakenPiece() != null) {
-            if(pm.getTakenPiece() != null && board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()].getColour() == Colour.WHITE)
-            {
-                if (origin.getType() == Type.normal)
-                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.normal, Colour.WHITE);
-                else
-                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.king, Colour.WHITE);
-            }
-            else if(pm.getTakenPiece() != null && board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()].getColour() == Colour.BLACK)
-            {
-                if (origin.getType() == Type.normal)
-                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.normal, Colour.WHITE);
-                else
-                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.king, Colour.WHITE);
-            }
-        }
-        if(origin.getColour() == Colour.WHITE) {
-            if (origin.getType() == Type.normal)
-                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.normal, Colour.WHITE);
-            else
-                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.king, Colour.WHITE);
-        }
-        else if(origin.getColour() == Colour.BLACK) {
-            if (origin.getType() == Type.normal)
-                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.normal, Colour.BLACK);
-            else
-                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.king, Colour.BLACK);
-        }
-    }
+////    public static void addChecker(PreviousMove pm){
+////        Piece origin = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
+////        System.out.println("Piece: "+ pm.getTakenPiece().getRow() + " "+ pm.getTakenPiece().getCol());
+////        if(pm.getTakenPiece() != null) {
+////            if(pm.getTakenPiece().getColour() == Colour.WHITE)
+////            {
+////                if (origin.getType() == Type.normal)
+////                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.normal, Colour.WHITE);
+////                else
+////                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.king, Colour.WHITE);
+////            }
+////            else if(pm.getTakenPiece() != null && board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()].getColour() == Colour.BLACK)
+////            {
+////                if (origin.getType() == Type.normal)
+////                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.normal, Colour.WHITE);
+////                else
+////                    board.getBoard()[pm.getTakenPiece().getRow()][pm.getTakenPiece().getCol()] = new Piece(Type.king, Colour.WHITE);
+////            }
+////        }
+//        if(origin.getColour() == Colour.WHITE) {
+//            if (origin.getType() == Type.normal)
+//                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.normal, Colour.WHITE);
+//            else
+//                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.king, Colour.WHITE);
+//        }
+//        else if(origin.getColour() == Colour.BLACK) {
+//            if (origin.getType() == Type.normal)
+//                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.normal, Colour.BLACK);
+//            else
+//                board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = new Piece(Type.king, Colour.BLACK);
+//        }
+//    }
 
 
 

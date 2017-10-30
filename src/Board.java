@@ -22,6 +22,8 @@ public class Board
 
     private Point highlight;
 
+    static public Piece removedPiece;
+
     public int colourRow = 1;
 
     public int kingrow = 2;
@@ -64,15 +66,15 @@ public class Board
     {
         for (ROW = 0; ROW < BOARD_SIZE; ROW += 2)
         {
-            board[0][ROW] = new Piece(Type.normal, Colour.BLACK);
-            board[2][ROW] = new Piece(Type.normal, Colour.BLACK);
-            board[6][ROW] = new Piece(Type.normal, Colour.WHITE);
+            board[0][ROW] = new Piece(Type.normal, Colour.BLACK, new Point(0, ROW));
+            board[2][ROW] = new Piece(Type.normal, Colour.BLACK, new Point(2, ROW));
+            board[6][ROW] = new Piece(Type.normal, Colour.WHITE, new Point(6, ROW));
         }
         for (ROW = 1; ROW < BOARD_SIZE; ROW += 2)
         {
-            board[1][ROW] = new Piece(Type.normal, Colour.BLACK);
-            board[5][ROW] = new Piece(Type.normal, Colour.WHITE);
-            board[7][ROW] = new Piece(Type.normal, Colour.WHITE);
+            board[1][ROW] = new Piece(Type.normal, Colour.BLACK, new Point(1, ROW));
+            board[5][ROW] = new Piece(Type.normal, Colour.WHITE, new Point(5, ROW));
+            board[7][ROW] = new Piece(Type.normal, Colour.WHITE, new Point(7, ROW));
         }
     }
 
@@ -183,12 +185,12 @@ public class Board
                         if (destCol > col) {
 
                             if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == Colour.BLACK)
-                                removeChecker(row - 1, col + 1);
+                                removetakenPiece(row - 1, col + 1);
                         }
                         //check if left
                         if(destCol < col) {
                             if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == Colour.BLACK)
-                                removeChecker(row - 1, col - 1);
+                                removetakenPiece(row - 1, col - 1);
                         }
                     }
                 }
@@ -200,12 +202,12 @@ public class Board
                         //check if right
                         if (destCol > col) {
                             if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == Colour.WHITE)
-                                removeChecker(row + 1, col + 1);
+                                removetakenPiece(row + 1, col + 1);
                         }
                         if(destCol < col) {
                             //check if left
                             if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == Colour.WHITE)
-                                removeChecker(row + 1, col - 1);
+                                removetakenPiece(row + 1, col - 1);
                         }
                     }
                 }
@@ -242,24 +244,29 @@ public class Board
     {
         board[row][col] = null;
     }
-
-    public boolean removePiece(int row, int col, int destRow, int destCol)
+    public void removetakenPiece(int row, int col)
     {
-        if(move.jumpedRight(row, col, destRow, destCol)) {
-            if (board[row][col].getColour() == Colour.WHITE)
-                if (board[row][col].getType() == Type.normal)
-                    board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
-                else
-                    board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
-        }
-        else {
-            if (board[row][col].getType() == Type.normal)
-                board[destRow][destCol] = new Piece(Type.normal, Colour.BLACK);
-            else
-                board[destRow][destCol] = new Piece(Type.king, Colour.BLACK);
-        }
-        return false;
+        removedPiece = new Piece(board[row][col].getType(), board[row][col].getColour(), new Point(row, col));
+        board[row][col] = null;
     }
+
+//    public boolean removePiece(int row, int col, int destRow, int destCol)
+//    {
+//        if(move.jumpedRight(row, col, destRow, destCol)) {
+//            if (board[row][col].getColour() == Colour.WHITE)
+//                if (board[row][col].getType() == Type.normal)
+//                    board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
+//                else
+//                    board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
+//        }
+//        else {
+//            if (board[row][col].getType() == Type.normal)
+//                board[destRow][destCol] = new Piece(Type.normal, Colour.BLACK);
+//            else
+//                board[destRow][destCol] = new Piece(Type.king, Colour.BLACK);
+//        }
+//        return false;
+//    }
 
     private void kingRemove(int row, int col, int destRow, int destCol, Colour opkingColour)
     {
@@ -268,12 +275,12 @@ public class Board
                 //take black checker with white king
                 if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == opkingColour)
                 {
-                    removeChecker(row - 1, col + 1);
+                    removetakenPiece(row - 1, col + 1);
                 }
             }
             if(destCol < col) {
                 if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == opkingColour)
-                    removeChecker(row - 1, col - 1);
+                    removetakenPiece(row - 1, col - 1);
             }
         }
 
@@ -281,11 +288,11 @@ public class Board
             if(destCol > col) {
                 //take white checker with black king
                 if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == opkingColour)
-                    removeChecker(row + 1, col + 1);
+                    removetakenPiece(row + 1, col + 1);
             }
             if(destCol < col) {
                 if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == opkingColour)
-                    removeChecker(row + 1, col - 1);
+                    removetakenPiece(row + 1, col - 1);
             }
         }
     }
@@ -298,55 +305,14 @@ public class Board
 
         PreviousMove pm;
 
-        //todo need to change this staement as move.validjump is checking for the current move and not the rpevious move and therefore i need do something to track the removed piece0
-        if(move.validJump(row, col, destRow, destCol)) {
+        if(row+2 == destRow || row-2 == destRow) {
             System.out.println("has jumped and is being put into the stack");
-            if(row>destRow) {
-                if (move.jumpedRight(row, col, destRow, destCol))
-                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row + 1, col + 1));
-                else
-                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row + 1, col - 1));
-            }
-            else {
-                if (move.jumpedRight(row, col, destRow, destCol))
-                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row - 1, col + 1));
-                else
-                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row - 1, col - 1));
-            }
+                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), removedPiece);
         }
         else {
             pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), null);
         }
         PastMoves.addMove(pm);
-//        Point po = new Point(old_row, old_col);
-//        Point pd = new Point(new_row, new_col);
-//        pm.setDest(pd);
-//        pm.setOrigin(po);
-
-        //System.out.println("STORING: " + pm.getDest().getRow() + pm.getDest().getCol() + "at index: " + pastmovesindex);
-        //System.out.println(pastMoves.peek().getOrigin().getRow());
-        //System.out.println("moved from: "+pastMoves.[pastmovesindex].getOrigin().getRow() + ", " + pastMoves.peek().getOrigin().getCol() + " to: "+pastMoves.peek().getDest().getRow() + ", " + pastMoves.peek().getDest().getCol());
-    }
-
-    //if undo button pressed then pull from stack and then stored so it can be redone
-
-    private void test(int row, int col, int destRow, int destCol) {
-        board[destRow][destCol] = board[row][col];
-        removeChecker(row, col);
-    }
-
-    void undo()
-    {
-
-
-        //addChecker(PastMoves.getLast().getDest().getRow(), PastMoves.getLast().getDest().getCol(), PastMoves.getLast().getOrigin().getRow(), PastMoves.getLast().getOrigin().getCol());
-        //removeChecker(PastMoves.getLast().getDest().getRow(), PastMoves.getLast().getDest().getCol());
-
-//        else
-//        {
-//            System.out.println("not moves in 'ere");
-//
-//        }
     }
 
 
@@ -406,144 +372,6 @@ public class Board
                 g2d.fillOval(x + 10, y + 10, 3 * WIDTH / 4, 3 * HEIGHT / 4);
                 x += WIDTH;
             }
-
-
-
-//            if(board[y][x].getType() == Type.king)
-//            {
-//                g2d.setColor(Color.MAGENTA);
-//                g2d.fillOval(highlightX*60,highlightY*60,WIDTH,HEIGHT);
-//            }
-
-            /*if (ishighlighted)
-            {
-                g2d.setColor(Color.orange);
-                g2d.drawRect(highlightX * 60, highlightY * 60, WIDTH, HEIGHT);
-            }
-
-            g2d.setBackground(new Color(0, 191, 255, 50));
-
-            if (clicks == 0)
-            {
-                try
-                {
-                    if (validPos(highlightX,highlightY))
-                    {
-                        //if white can move right
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX + 1, highlightY - 1)))
-                        {
-                            g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
-                        }
-                        //if white can move left
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX - 1, highlightY - 1)))
-                        {
-                            g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
-                        }
-                        //if white can take right
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX + 2, highlightY - 2)))
-                        {
-                            g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-                        }
-
-                        //if white can take left
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX - 2, highlightY - 2)))
-                        {
-                            g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-                        }
-
-                        //if black can move left
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX - 1, highlightY + 1)))
-                        {
-                            g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
-                        }
-                        //if black can move right
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX + 1, highlightY + 1)))
-                        {
-                            g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
-                        }
-                        //if black can take white on the right
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX + 2, highlightY + 2)))
-                        {
-                            g2d.fillRect((highlightX + 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
-                        }
-
-                        //if black can take white on the left
-                        if (move.isValidMove(new Point(highlightX, highlightY), new Point(highlightX - 2, highlightY + 2)))
-                        {
-                            g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-                        }
-
-                    }
-                }catch (ArrayIndexOutOfBoundsException e){}
-//                try
-//                {
-//                    validMove(highlightX, highlightY);
-//                    if (isblack)
-//                    {
-//                        if (blackcanmoveright)
-//                        {
-//                            //make sure it doesent paint outside the board
-//                            if (((highlightX + 1) >= 0 && (highlightX + 1) < BOARD_SIZE) && ((highlightY + 1) < BOARD_SIZE))
-//                            {
-//                                g2d.fillRect((highlightX + 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                        if (blackcanmoveleft)
-//                        {
-//                            if ((highlightX - 1) >= 0 && highlightY + 1 < BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX - 1) * 60, (highlightY + 1) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                        if (blackcanmoverightdia)
-//                        {
-//                            if ((highlightX + 2) < BOARD_SIZE && highlightY + 2 < BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX + 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                        if (blackcanmoveleftdia)
-//                        {
-//                            if ((highlightX - 2) >= 0 && highlightY+2<BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX - 2) * 60, (highlightY + 2) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                    }
-//                    if (iswhite)
-//                    {
-//                        if (whitecanmoveright)
-//                        {
-//                            if ((highlightX + 1) < BOARD_SIZE && highlightY+2<BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX + 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                        if (whitecanmoveleft)
-//                        {
-//                            if ((highlightX - 1) >= 0 && highlightY-1<BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX - 1) * 60, (highlightY - 1) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                        if (whitecanmoveleftdia)
-//                        {
-//                            if ((highlightX - 2) >=0 && highlightY-2<BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX - 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                        if (whitecanmoverightdia)
-//                        {
-//                            if ((highlightX + 2) <BOARD_SIZE && highlightY-2 <BOARD_SIZE)
-//                            {
-//                                g2d.fillRect((highlightX + 2) * 60, (highlightY - 2) * 60, WIDTH, HEIGHT);
-//                            }
-//                        }
-//                    }
-//                } catch (ArrayIndexOutOfBoundsException e) {}
-
-            } */
 
             if(highlight != null) {
                 g2d.setColor(Color.orange);
