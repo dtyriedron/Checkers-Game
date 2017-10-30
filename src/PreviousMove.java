@@ -1,10 +1,12 @@
 public class PreviousMove {
-    private Point origin, dest;
+    private Point origin, dest, takenPiece;
 
-    public PreviousMove(Point origin, Point dest)
+
+    public PreviousMove(Point origin, Point dest, Point takenPiece)
     {
         this.origin = origin;
         this.dest = dest;
+        this.takenPiece = takenPiece;
     }
 
     public Point getOrigin()
@@ -26,4 +28,9 @@ public class PreviousMove {
     {
         this.dest = dest;
     }
+
+    public Point getTakenPiece() {
+        return takenPiece;
+    }
+
 }

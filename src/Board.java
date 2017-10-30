@@ -16,31 +16,11 @@ public class Board
     public int pot_row;
     public int pot_col;
 
-
-    public boolean isblack = false;
-    public boolean isoldblack = false;
-    public boolean blackcanmoveright = false;
-    public boolean blackcanmoveleft = false;
-    public boolean iswhite = false;
-    public boolean isoldwhite = false;
-    public boolean whitecanmoveright = false;
-    public boolean whitecanmoveleft = false;
-
-    public boolean blackcanmoverightdia =false;
-    public boolean blackcanmoveleftdia = false;
-    public boolean whitecanmoverightdia = false;
-    public boolean whitecanmoveleftdia = false;
-    public boolean blackcantakeleft = false;
-    public boolean blackcantakeright = false;
-    public boolean whitecantakeleft = false;
-    public boolean whitecantakeright = false;
-
     public int clicks=0;
 
     private Move move;
 
     private Point highlight;
-
 
     public int colourRow = 1;
 
@@ -58,6 +38,8 @@ public class Board
 
     //array to store the points where a potential move can be made
     private Point[] potMoves;
+
+
 
     //private PreviousMove[] pastMoves;
     //private int pastmovesize = 5;
@@ -141,7 +123,6 @@ public class Board
         pot_col--;
         if(validPos(pot_row, pot_col))
         {
-            System.out.println(couldjump);
             if(move.validJump(old_row, old_col, pot_row, pot_col)) {
                 couldjump = true;
                 potMoves = new Point[BOARD_SIZE];
@@ -257,23 +238,28 @@ public class Board
 
     }
 
-    public void addChecker(int row, int col, int destRow, int destCol){
-        if(getChecker(row, col).getColour() == Colour.WHITE)
-            if (getChecker(row, col).getType() == Type.normal)
-                board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
-            else
-                board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
-        else
-            if(getChecker(row, col).getType() == Type.normal)
-                board[destRow][destCol] = new Piece(Type.normal, Colour.BLACK);
-            else
-                board[destRow][destCol] = new Piece(Type.king, Colour.BLACK);
-    }
     public void removeChecker(int row, int col)
     {
         board[row][col] = null;
     }
 
+    public boolean removePiece(int row, int col, int destRow, int destCol)
+    {
+        if(move.jumpedRight(row, col, destRow, destCol)) {
+            if (board[row][col].getColour() == Colour.WHITE)
+                if (board[row][col].getType() == Type.normal)
+                    board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
+                else
+                    board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
+        }
+        else {
+            if (board[row][col].getType() == Type.normal)
+                board[destRow][destCol] = new Piece(Type.normal, Colour.BLACK);
+            else
+                board[destRow][destCol] = new Piece(Type.king, Colour.BLACK);
+        }
+        return false;
+    }
 
     private void kingRemove(int row, int col, int destRow, int destCol, Colour opkingColour)
     {
@@ -310,12 +296,32 @@ public class Board
         removeChecker(row, col);
         potMoves = new Point[BOARD_SIZE];
 
-        PreviousMove pm = new PreviousMove(new Point(old_row, old_col), new Point(new_row, new_col));
+        PreviousMove pm;
+
+        //todo need to change this staement as move.validjump is checking for the current move and not the rpevious move and therefore i need do something to track the removed piece0
+        if(move.validJump(row, col, destRow, destCol)) {
+            System.out.println("has jumped and is being put into the stack");
+            if(row>destRow) {
+                if (move.jumpedRight(row, col, destRow, destCol))
+                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row + 1, col + 1));
+                else
+                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row + 1, col - 1));
+            }
+            else {
+                if (move.jumpedRight(row, col, destRow, destCol))
+                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row - 1, col + 1));
+                else
+                    pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), new Point(row - 1, col - 1));
+            }
+        }
+        else {
+            pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), null);
+        }
+        PastMoves.addMove(pm);
 //        Point po = new Point(old_row, old_col);
 //        Point pd = new Point(new_row, new_col);
 //        pm.setDest(pd);
 //        pm.setOrigin(po);
-        PastMoves.addMove(pm);
 
         //System.out.println("STORING: " + pm.getDest().getRow() + pm.getDest().getCol() + "at index: " + pastmovesindex);
         //System.out.println(pastMoves.peek().getOrigin().getRow());
@@ -553,317 +559,6 @@ public class Board
         }
 
     }
-
-//    private void removeChecker(int x, int y)
-//    {
-//
-//        //black can take white to the right
-//        if(blackcantakeright)
-//        {
-//            board[y+1][x+1] = null;
-//        }
-//        //black can take white to the left
-//        if(blackcantakeleft)
-//        {
-//            board[y+1][x-1] = null;
-//        }
-//
-//        //white can take black to the right
-//        if(whitecantakeright)
-//        {
-//            board[y-1][x+1] = null;
-//        }
-//        //white can take black to the left
-//        if(whitecantakeleft)
-//        {
-//            board[y-1][x-1] = null;
-//        }
-//
-//        board[y][x] = null;
-//        if (board[y][x] == null)
-//        {
-//            isRemoved = true;
-//        }
-//        else
-//        {
-//            isRemoved = false;
-//        }
-//    }
-//    private void addChecker(int x, int y)
-//    {
-//        if(board[y][x] == null && isoldblack)
-//        {
-//            if(y==7)
-//            {
-//                board[y][x] = new Piece(Type.king, Colour.BLACK);
-//            }
-//            else
-//            {
-//                System.out.println("black piece added");
-//                board[y][x] = new Piece(Type.normal, Colour.BLACK);
-//            }
-//        }
-//        if(board[y][x] == null && isoldwhite)
-//        {
-//            if(y==7)
-//            {
-//                board[y][x] = new Piece(Type.king, Colour.WHITE);
-//            }
-//            else
-//            {
-//                System.out.println("white piece added");
-//                board[y][x] = new Piece(Type.normal, Colour.WHITE);
-//            }
-//        }
-//    }
-
-//    public void isMoving(int x, int y, int old_x, int old_y)
-//    {
-//        System.out.println("x: "+x+" y: "+y);
-//        System.out.println("old x: "+old_x+ " old y: "+old_y);
-//        clicks=1;
-//        //black can move left
-//        try
-//        {
-//            if (old_x-1 == x && old_y+1 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[y][x] == null))
-//            {
-//                isoldblack=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                isoldblack=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //black can move right
-//        try
-//        {
-//            if(old_x+1 == x && old_y+1 == y && board[old_y][old_x].getColour() == Colour.BLACK &&  board[y][x] == null)
-//            {
-//                isoldblack=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                isoldblack =false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//        //black can take left
-//        try
-//        {
-//            if (old_x-2 == x && old_y+2 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[old_y+1][old_x-1].getColour() == Colour.WHITE && board[y][x] == null))
-//            {
-//                blackcantakeleft=true;
-//                isoldblack=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                blackcantakeleft=false;
-//                isoldblack=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //black can take right
-//        try
-//        {
-//            if(old_x+2 == x && old_y+2 == y && board[old_y][old_x].getColour() == Colour.BLACK && (board[old_y+1][old_x+1].getColour() == Colour.WHITE && board[y][x] == null))
-//            {
-//                blackcantakeright=true;
-//                isoldblack=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                blackcantakeright=false;
-//                isoldblack =false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //white can move left
-//        try
-//        {
-//            if(old_x-1 == x && old_y-1 == y && board[old_y][old_x].getColour() == Colour.WHITE && board[y][x] == null)
-//            {
-//                isoldwhite=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                isoldwhite=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //white can move right
-//        try
-//        {
-//            if(old_x+1 == x && old_y-1 == y && board[old_y][old_x].getColour() == Colour.WHITE && board[y][x] == null)
-//            {
-//                isoldwhite=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                isoldwhite=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //white can take left
-//        try
-//        {
-//            if(old_x-2 == x && old_y-2 == y && board[old_y][old_x].getColour() == Colour.WHITE && (board[old_y-1][old_x-1].getColour() == Colour.BLACK && board[y][x] == null))
-//            {
-//                whitecantakeleft=true;
-//                isoldwhite=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                whitecantakeleft=false;
-//                isoldwhite=false;
-//            }
-//
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //white can take right
-//        try
-//        {
-//            if(old_x+2 == x && old_y-2 == y && board[old_y][old_x].getColour() == Colour.WHITE && (board[old_y-1][old_x+1].getColour() == Colour.BLACK && board[y][x] == null))
-//            {
-//                whitecantakeright=true;
-//                isoldwhite=true;
-//                removeChecker(old_x,old_y);
-//                addChecker(x,y);
-//                whitecantakeright=false;
-//                isoldwhite=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//    }
-
-//    public void validMove(int highlightX, int highlightY)
-//    {
-//            //check if the piece is black
-//            if (board[highlightY + ymod][highlightX + xmod] == piece.BLACK)
-//            {
-//                isblack = true;
-//            }
-//            else
-//            {
-//                isblack=false;
-//            }
-//        try
-//        {
-//            //check if the piece can move right and down
-//            if (board[highlightY + 1][highlightX + 1] == NULL)
-//            {
-//                blackcanmoveright = true;
-//                old_click_x= highlightX;
-//                old_click_y= highlightY;
-//            }
-//            else
-//            {
-//                blackcanmoveright=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        try
-//        {
-//            //check if the piece can move left and down
-//            if (board[highlightY + 1][highlightX - 1] == NULL)
-//            {
-//                blackcanmoveleft = true;
-//                old_click_x= highlightX;
-//                old_click_y= highlightY;
-//            }
-//            else
-//            {
-//                blackcanmoveleft=false;
-//            }
-//
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //check if the piece is black and can take a white piece to the left
-//        try{
-//            if(board[highlightY+2][highlightX-2]==NULL && board[highlightY+1][highlightX-1]==piece.WHITE)
-//            {
-//                blackcanmoveleftdia =true;
-//                old_click_x=highlightX;
-//                old_click_y=highlightY;
-//            }
-//            else
-//            {
-//                blackcanmoveleftdia=false;
-//            }
-//        }catch (ArrayIndexOutOfBoundsException e){}
-//
-//        //check if the piece is black and can take a white piece to the right
-//        try{
-//            if(board[highlightY+2][highlightX+2]==NULL && board[highlightY+1][highlightX+1]==piece.WHITE)
-//            {
-//                blackcanmoverightdia =true;
-//                old_click_x=highlightX;
-//                old_click_y=highlightY;
-//            }
-//            else
-//            {
-//                blackcanmoverightdia=false;
-//            }
-//        }catch (ArrayIndexOutOfBoundsException e){}
-//
-//        //check is the piece is white
-//        if(board[highlightY][highlightX] == piece.WHITE)
-//        {
-//            iswhite=true;
-//        }
-//        else
-//        {
-//            iswhite=false;
-//        }
-//
-//        try
-//        {
-//            //check if the piece can up and right
-//            if (board[highlightY - 1][highlightX + 1] == NULL)
-//            {
-//                whitecanmoveright = true;
-//                old_click_x= highlightX;
-//                old_click_y= highlightY;
-//            }
-//            else
-//            {
-//                whitecanmoveright=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        //check if the piece can go up and left
-//        try
-//        {
-//            if (board[highlightY - 1][highlightX- 1] == NULL)
-//            {
-//                whitecanmoveleft = true;
-//                old_click_x= highlightX;
-//                old_click_y= highlightY;
-//            }
-//            else
-//            {
-//                whitecanmoveleft=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        try{
-//            if(board[highlightY-2][highlightX-2]==NULL && board[highlightY-1][highlightX-1]==piece.BLACK)
-//            {
-//                whitecanmoveleftdia = true;
-//                old_click_x=highlightX;
-//                old_click_y=highlightY;
-//            }
-//            else
-//            {
-//                whitecanmoveleftdia=false;
-//            }
-//        }catch(ArrayIndexOutOfBoundsException e){}
-//
-//        try{
-//            if(board[highlightY-2][highlightX+2]==NULL && board[highlightY-1][highlightX+1]==piece.BLACK)
-//            {
-//                whitecanmoverightdia =true;
-//                old_click_x=highlightX;
-//                old_click_y=highlightY;
-//            }
-//            else
-//            {
-//                whitecanmoverightdia=false;
-//            }
-//        }catch (ArrayIndexOutOfBoundsException e){}
-//    }
-
     public Piece[][] getBoard()
     {
         return board;
