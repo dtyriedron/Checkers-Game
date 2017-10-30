@@ -7,12 +7,12 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
 {
     private static final int WIDTH = 400;
     private static final int HEIGHT = 400;
-    private Board board = new Board();
+    private Board board;
     private static int player = 1;
     private Piece piece;
     private int clicks=0;
 
-    private JButton undo;
+    private static JButton undo;
 
     //game loop fields
     private Thread thread;
@@ -20,21 +20,18 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
     private long targetTime = 1000/FPS;
     private boolean isRunning = false;
 
-    //mouse position
-    private static int mouse_x, mouse_y;
-    private int old_click_x=40;
-    private int old_click_y=40;
 
     private GameWindow()
     {
+        System.out.println("constructor called");
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
 
+        board = new Board();
         undo = new JButton(new ImageIcon(getClass().getResource("undo.png")));
-        undo.setBounds(500,500, 40, 40);
-        add(undo);
+        undo.setBounds(360,360, 40, 40);
         undo.addActionListener(this);
         start();
     }
@@ -160,10 +157,11 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         //set the gui and graphics
         JFrame frame = new JFrame("checkers");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(new GameWindow());
+       // frame.setContentPane(new GameWindow());
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
         frame.add(new GameWindow(), BorderLayout.CENTER);
+        frame.add(undo);
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setSize(600,600);
