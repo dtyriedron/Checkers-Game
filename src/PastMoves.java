@@ -1,8 +1,10 @@
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.Stack;
 
 public class PastMoves {
 
-    private static Stack<PreviousMove> previousMoves = new Stack<PreviousMove>();
+    private static Deque<PreviousMove> previousMoves = new LinkedList<PreviousMove>() {};
     private static int index = 0;
     private static PreviousMove redoMove;
 
@@ -26,7 +28,7 @@ public class PastMoves {
         return tmp;
     }
 
-    public static Stack<PreviousMove> getPreviousMoves() {
+    public static Deque<PreviousMove> getPreviousMoves() {
         return previousMoves;
     }
 }

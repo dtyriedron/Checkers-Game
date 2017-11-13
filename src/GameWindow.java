@@ -1,5 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 
@@ -12,7 +15,7 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
     private Piece piece;
     private int clicks=0;
 
-    private static JButton undo, redo;
+    private static JButton undo, redo, replay;
 
 
 
@@ -32,13 +35,23 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         addMouseMotionListener(this);
 
         board = new Board();
-        undo = new JButton(new ImageIcon(getClass().getResource("undo.png")));
-        undo.setPreferredSize(new Dimension(40, 40));
-        undo.addActionListener(this);
+        try {
+            undo = new JButton(new ImageIcon(ImageIO.read(new File("images/undo.png"))));
+            undo.setPreferredSize(new Dimension(40, 40));
+            undo.addActionListener(this);
 
-        redo = new JButton("redo");
-        redo.setPreferredSize(new Dimension(40, 40));
-        redo.addActionListener(this);
+            redo = new JButton(new ImageIcon(ImageIO.read(new File("images/redo.png"))));
+            redo.setPreferredSize(new Dimension(40, 40));
+            redo.addActionListener(this);
+
+            replay = new JButton(new ImageIcon(ImageIO.read(new File("images/replay.png"))));
+            replay.setPreferredSize(new Dimension(40, 40));
+            replay.addActionListener(this);
+        }
+        catch (IOException ex) {
+            System.out.println(ex.toString());
+        }
+
         start();
     }
 
@@ -47,6 +60,8 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
             Move.undoMove();
         if(e.getSource() ==  redo)
             Move.redoMove();
+        if(e.getSource() == replay)
+            Move.replayGame();
     }
 
     public void mousePressed(MouseEvent e)
@@ -177,14 +192,24 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         gbc.anchor = GridBagConstraints.NORTH;
         frame.add(new GameWindow(), gbc);
 
+        //change the pos of the replay button
         gbc.gridx = 1;
-        gbc.weighty = 0.1;
-        gbc.weightx = 0.1;
+        gbc.gridy = 0;
+        gbc.weighty = 1;
+        gbc.weightx = 0.5;
+        gbc.anchor = GridBagConstraints.CENTER;
+        frame.add(replay, gbc);
+
+        //change the pos of the undo button
         gbc.anchor = GridBagConstraints.WEST;
         frame.add(undo, gbc);
 
-        gbc.anchor = GridBagConstraints.CENTER;
+        //change the pos of redo button
+        gbc.anchor = GridBagConstraints.EAST;
         frame.add(redo, gbc);
+
+
+
 
         frame.pack();
         frame.setLocationRelativeTo(null);

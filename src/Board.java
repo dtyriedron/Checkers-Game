@@ -169,29 +169,22 @@ public class Board
         new_row = row;
         new_col = col;
         checkMove(old_row, old_col, new_row, new_col);
+        //System.out.println("replay:::::: " + PastMoves.getPreviousMoves());
     }
 
-    private void checkMove(int row, int col, int destRow, int destCol) {
+    public void checkMove(int row, int col, int destRow, int destCol) {
 
         if (move.couldJump(row, col))
         {
-            //check if king
-            if (getChecker(row, col) != null && getChecker(row, col).getType() == Type.king) {
-                if (getChecker(row, col).getColour() == Colour.WHITE) {
-                    kingRemove(row, col, destRow, destCol, Colour.BLACK);
-                } else if (getChecker(row, col).getColour() == Colour.BLACK) {
-                    kingRemove(row, col, destRow, destCol, Colour.WHITE);
-                }
-            }
             moveIfJumping(row, col, destRow, destCol);
-            if (move.validKing(destRow))
+            if (move.validKing(destRow, destCol))
                 board[destRow][destCol].setType(Type.king);
         }
         else
         {
             if(move.couldMove(row, col)) {
                 moveIfNotJumping(row, col, destRow, destCol);
-                if (move.validKing(destRow)) {
+                if (move.validKing(destRow, destCol)) {
                     board[destRow][destCol].setType(Type.king);
                 }
             }
@@ -208,63 +201,17 @@ public class Board
         board[row][col] = null;
     }
 
-//    public boolean removePiece(int row, int col, int destRow, int destCol)
-//    {
-//        if(move.jumpedRight(row, col, destRow, destCol)) {
-//            if (board[row][col].getColour() == Colour.WHITE)
-//                if (board[row][col].getType() == Type.normal)
-//                    board[destRow][destCol] = new Piece(Type.normal, Colour.WHITE);
-//                else
-//                    board[destRow][destCol] = new Piece(Type.king, Colour.WHITE);
-//        }
-//        else {
-//            if (board[row][col].getType() == Type.normal)
-//                board[destRow][destCol] = new Piece(Type.normal, Colour.BLACK);
-//            else
-//                board[destRow][destCol] = new Piece(Type.king, Colour.BLACK);
-//        }
-//        return false;
-//    }
-
-    private void kingRemove(int row, int col, int destRow, int destCol, Colour opkingColour)
-    {
-        if(destRow < row) {
-            if (destCol > col) {
-                //take black checker with white king
-                if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == opkingColour)
-                {
-                    removetakenPiece(row - 1, col + 1);
-                }
-            }
-            if(destCol < col) {
-                if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == opkingColour)
-                    removetakenPiece(row - 1, col - 1);
-            }
-        }
-
-        if(destRow > row) {
-            if(destCol > col) {
-                //take white checker with black king
-                if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == opkingColour)
-                    removetakenPiece(row + 1, col + 1);
-            }
-            if(destCol < col) {
-                if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == opkingColour)
-                    removetakenPiece(row + 1, col - 1);
-            }
-        }
-    }
-
     private void moveIfJumping(int row, int col, int destRow, int destCol)
     {
         PreviousMove pm;
         //check if white
         System.out.println("origin Point: "+getChecker(row,col).getPoint().getRow() + " "+ getChecker(row,col).getPoint().getCol());
-        if (getChecker(row, col) != null && getChecker(row, col).getColour() == Colour.WHITE && getChecker(row, col).getType() == Type.normal) {
+        if (getChecker(row, col) != null && ((getChecker(row, col).getColour() == Colour.WHITE && getChecker(row, col).getType() == Type.normal) || getChecker(row, col).getType() == Type.king)) {
             if (destRow +2 == row) {
                 //check if right
                 if (destCol -2 == col) {
-                    if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == Colour.BLACK) {
+                    if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == move.oppositeColour(getChecker(row, col).getColour())) {
+                        System.out.println("white or king right");
                         removetakenPiece(row - 1, col + 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
@@ -275,7 +222,8 @@ public class Board
                 }
                 //check if left
                 if (destCol +2 == col) {
-                    if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == Colour.BLACK) {
+                    if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == move.oppositeColour(getChecker(row, col).getColour())) {
+                        System.out.println("white or king left");
                         removetakenPiece(row - 1, col - 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
@@ -287,11 +235,12 @@ public class Board
             }
         }
         //check if black
-        if (getChecker(row, col) != null && getChecker(row, col).getColour() == Colour.BLACK && getChecker(row, col).getType() == Type.normal) {
+        if (getChecker(row, col) != null && ((getChecker(row, col).getColour() == Colour.BLACK && getChecker(row, col).getType() == Type.normal) || getChecker(row, col).getType() == Type.king)) {
             if (destRow -2 == row) {
                 //check if right
                 if (destCol - 2 == col) {
-                    if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == Colour.WHITE){
+                    if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == move.oppositeColour(getChecker(row, col).getColour())){
+                        System.out.println("black or king right");
                         removetakenPiece(row + 1, col + 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
@@ -302,7 +251,8 @@ public class Board
                 }
                 if (destCol + 2 == col) {
                     //check if left
-                    if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == Colour.WHITE){
+                    if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == move.oppositeColour(getChecker(row, col).getColour())){
+                        System.out.println("black or king left");
                         removetakenPiece(row + 1, col - 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
@@ -433,6 +383,12 @@ public class Board
     public Piece[][] getBoard()
     {
         return board;
+    }
+
+    public void clearBoard()
+    {
+        board = new Piece[BOARD_SIZE][BOARD_SIZE];
+        installCheckers();
     }
 }
 
