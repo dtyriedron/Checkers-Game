@@ -115,15 +115,40 @@ public class Move extends JPanel
 
 
     public static void undoMove() {
-        //System.out.println(PastMoves.getLast().getOrigin().getRow()+" "+ PastMoves.getLast().getOrigin().getCol());
         PreviousMove pm = PastMoves.getLast();
-        //addChecker(pm);
-        board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
+        if(pm != null) {
+            //System.out.println("this is the past move::: " + PastMoves.getLast().getOrigin().getCol() + "" + PastMoves.getLast().getOrigin().getRow() + "->" + PastMoves.getLast().getDest().getCol() + "" + PastMoves.getLast().getDest().getRow());
+            System.out.println("replay:::::: " + PastMoves.getPreviousMoves());
+            //addChecker(pm);
+            board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
 //        System.out.println(Board.removedPiece.getPoint().getRow()+ " "+ Board.removedPiece.getPoint().getCol());
-        if(pm.getTakenPiece() != null)
-        board.getBoard()[Board.removedPiece.getPoint().getRow()][Board.removedPiece.getPoint().getCol()] = Board.removedPiece;
-        board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()] = null;
+            if (pm.getTakenPiece() != null)
+                board.getBoard()[Board.removedPiece.getPoint().getRow()][Board.removedPiece.getPoint().getCol()] = Board.removedPiece;
+
+            board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()] = null;
+        }
+        else
+        {
+            System.out.println("nothing to undo");
+        }
     }
+    public static void redoMove()
+    {
+        PreviousMove pm = PastMoves.getRedoMove();
+        if(pm != null) {
+            //System.out.println("hhhhhhhhhhhhhheeeeeeeeeeeeeeeellllllllllllllllllo:::: "+pm.getOrigin().getRow() + " " + pm.getOrigin().getCol() + "->" + pm.getDest().getRow() + " " + pm.getDest().getCol());
+            board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()] = board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()];
+            if(pm.getTakenPiece() != null)
+                board.getBoard()[Board.removedPiece.getPoint().getRow()][Board.removedPiece.getPoint().getCol()] = null;
+
+            board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = null;
+        }
+        else
+        {
+            System.out.println("nothing to redo!!");
+        }
+    }
+
 
 ////    public static void addChecker(PreviousMove pm){
 ////        Piece origin = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];

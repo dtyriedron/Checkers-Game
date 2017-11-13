@@ -4,6 +4,7 @@ public class PastMoves {
 
     private static Stack<PreviousMove> previousMoves = new Stack<PreviousMove>();
     private static int index = 0;
+    private static PreviousMove redoMove;
 
     public static void addMove(PreviousMove pm) {
         previousMoves.push(pm);
@@ -12,7 +13,17 @@ public class PastMoves {
     }
 
     public static PreviousMove getLast() {
-        return previousMoves.peek();
+        if(previousMoves.size() < 1)
+            return null;
+
+        redoMove = previousMoves.pop();
+        return redoMove;
+    }
+
+    public static PreviousMove getRedoMove() {
+        PreviousMove tmp = redoMove;
+        redoMove = null;
+        return tmp;
     }
 
     public static Stack<PreviousMove> getPreviousMoves() {

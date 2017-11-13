@@ -5,14 +5,16 @@ import javax.swing.*;
 
 public class GameWindow extends JPanel implements ActionListener, MouseListener, MouseMotionListener, Runnable
 {
-    private static final int WIDTH = 400;
-    private static final int HEIGHT = 400;
+    private static final int WIDTH = 480;
+    private static final int HEIGHT = 480;
     private Board board;
     private static int player = 1;
     private Piece piece;
     private int clicks=0;
 
-    private static JButton undo;
+    private static JButton undo, redo;
+
+
 
     //game loop fields
     private Thread thread;
@@ -31,13 +33,20 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
 
         board = new Board();
         undo = new JButton(new ImageIcon(getClass().getResource("undo.png")));
-        undo.setBounds(360,360, 40, 40);
+        undo.setPreferredSize(new Dimension(40, 40));
         undo.addActionListener(this);
+
+        redo = new JButton("redo");
+        redo.setPreferredSize(new Dimension(40, 40));
+        redo.addActionListener(this);
         start();
     }
 
     public void actionPerformed(ActionEvent e) {
-        Move.undoMove();
+        if(e.getSource() == undo)
+            Move.undoMove();
+        if(e.getSource() ==  redo)
+            Move.redoMove();
     }
 
     public void mousePressed(MouseEvent e)
@@ -159,12 +168,27 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
        // frame.setContentPane(new GameWindow());
         frame.setResizable(false);
-        frame.setLayout(new BorderLayout());
-        frame.add(new GameWindow(), BorderLayout.CENTER);
-        frame.add(undo);
+        frame.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+
+        gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.weighty = 1;
+        gbc.anchor = GridBagConstraints.NORTH;
+        frame.add(new GameWindow(), gbc);
+
+        gbc.gridx = 1;
+        gbc.weighty = 0.1;
+        gbc.weightx = 0.1;
+        gbc.anchor = GridBagConstraints.WEST;
+        frame.add(undo, gbc);
+
+        gbc.anchor = GridBagConstraints.CENTER;
+        frame.add(redo, gbc);
+
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setSize(600,600);
+        frame.setSize(600,510);
         frame.setVisible(true);
     }
 
