@@ -1,4 +1,10 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
 
 
 public class Board
@@ -24,12 +30,7 @@ public class Board
 
     static public Piece removedPiece;
 
-    public int colourRow = 1;
-
-    public int kingrow = 2;
-
-
-    public boolean couldjump = false;
+    public static boolean player1turn = true;
 
     //size of the Board
     static final int BOARD_SIZE = 8;
@@ -38,10 +39,12 @@ public class Board
     //array to store checkers
     private Piece[][] board;
 
+    public ArrayList<Piece> Pieces = new ArrayList<>();
+
     //array to store the points where a potential move can be made
-    private Point[] potMoves;
+    public ArrayList<Point> potMoves = new ArrayList<>();
 
-
+    BufferedImage ninja, tache, ninjaKing, tacheKing;
 
     //private PreviousMove[] pastMoves;
     //private int pastmovesize = 5;
@@ -50,10 +53,20 @@ public class Board
     {
         //store the Board into a 2d array
         board = new Piece [BOARD_SIZE][BOARD_SIZE];
-        potMoves = new Point[BOARD_SIZE];
         move = new Move(this);
         System.out.println("CONSTRUCTOR, initialising pastMoves");
         installCheckers();
+
+        try {
+            ninja = ImageIO.read(new File("images/ninja.png"));
+            ninjaKing = ImageIO.read(new File("images/ninja_king.png"));
+            tache = ImageIO.read(new File("images/tache.png"));
+            tacheKing = ImageIO.read(new File("images/tache_king.png"));
+        }
+        catch (IOException ex)
+        {
+            System.out.println(ex.toString());
+        }
     }
 
 
@@ -85,84 +98,31 @@ public class Board
 
     public void highlightTile(int x, int y)
     {
-        //ishighlighted=true;
         if(validPos(y,x))
         highlight = new Point(y, x);
         old_row = y;
         old_col = x;
 
-        potMoves = new Point[BOARD_SIZE];
+        potMoves = new ArrayList<>();
+        if(validPlayer(y, x)) {
+            if ((!move.couldJump(y, x).isEmpty())) {
+                for (Point p : move.couldJump(y, x)) {
+                    System.out.println("---------POTENTIAL MOVE: " + p.toString());
+                    potMoves.add(p);
+                }
+            } else if (!move.couldMove(y, x).isEmpty()) {
+                for (Point p : move.couldMove(y, x)) {
+                    System.out.println("---------POTENTIAL MOVE: " + p.toString());
+                    potMoves.add(p);
+                }
+            }
+        }
         pot_row = old_row;
         pot_col = old_col;
 
         //if(getChecker(old_row, old_col) != null)
         //potMove(old_row, old_col, pot_row, pot_col);
     }
-
-//    public void potMove(int old_row, int old_col, int pot_row, int pot_col)
-//    {
-//        if(getChecker(old_row, old_col).getColour() == Colour.WHITE && getChecker(old_row, old_col).getType() == Type.normal && board[old_row-1][old_col+1] == null)
-//            colourRow = -1;
-//        else if(getChecker(old_row, old_col).getColour() == Colour.BLACK && getChecker(old_row, old_col).getType() == Type.normal)
-//            colourRow = 1;
-//
-//        pot_row += colourRow;
-//        pot_col++;
-//        if (move.validMove(old_row, old_col, pot_row, pot_col))
-//        {
-//            if(validPos(pot_row, pot_col)) {
-//                potMoves = new Point[BOARD_SIZE];
-//                potMoves[0] = new Point(pot_row, pot_col);
-//            }
-//        }
-//        pot_col-=2;
-//        if(move.validMove(old_row, old_col, pot_row, pot_col))
-//            if(validPos(pot_row, pot_col)) {
-//                potMoves[1] = new Point(pot_row, pot_col);
-//            }
-//        pot_row += colourRow;
-//        pot_col--;
-//        if(validPos(pot_row, pot_col))
-//        {
-//            //if(move.validJump(old_row, old_col, pot_row, pot_col)) {
-//                couldjump = true;
-//                potMoves = new Point[BOARD_SIZE];
-//                potMoves[0] = new Point(pot_row, pot_col);
-////                if (getChecker(old_row, old_col).getType() == Type.king) {
-////                    if (colourRow == -1)
-////                        kingrow = 4;
-////                    else
-////                        kingrow = -4;
-////                    pot_row += kingrow;
-////                    if (validPos(pot_row, pot_col))
-////                        potMoves[potmovesindex++] = new Point(pot_row, pot_col);
-////                    pot_row -= kingrow;
-////                }
-////            }
-////            else
-////                couldjump = false;
-//        }
-//        else {
-//            pot_col += 4;
-//
-//            if (validPos(pot_row, pot_col)) {
-//                System.out.println(couldjump);
-////                if(move.validJump(old_row, old_col, pot_row, pot_col)) {
-////                    couldjump = true;
-////                    potMoves[1] = new Point(pot_row, pot_col);
-////                }
-//            }
-//            else
-//                couldjump = false;
-//        }
-//    }
-
-    //public PreviousMove peekPastMoves()
-//    {
-//        //PreviousMove firstMove = pastMoves[0];
-//        //PreviousMove lastMove = pastMoves[pastMoves.length-1];
-//        //return lastMove;
-//    }
 
     public void secondClick(int row, int col)
     {
@@ -174,21 +134,34 @@ public class Board
 
     public void checkMove(int row, int col, int destRow, int destCol) {
 
-        if (move.couldJump(row, col))
-        {
-            moveIfJumping(row, col, destRow, destCol);
-            if (move.validKing(destRow, destCol))
-                board[destRow][destCol].setType(Type.king);
-        }
-        else
-        {
-            if(move.couldMove(row, col)) {
-                moveIfNotJumping(row, col, destRow, destCol);
-                if (move.validKing(destRow, destCol)) {
+        if( validPlayer(row, col)) {
+            if ((!move.couldJump(row, col).isEmpty())) {
+                for (Point p : move.couldJump(row, col)) {
+                    System.out.println("---------POTENTIAL MOVE: " + p.toString());
+                    potMoves.add(p);
+                }
+                moveIfJumping(row, col, destRow, destCol);
+                if (move.validKing(destRow, destCol))
                     board[destRow][destCol].setType(Type.king);
+
+            } else {
+                if (!move.couldMove(row, col).isEmpty()) {
+                    for (Point p : move.couldMove(row, col)) {
+                        System.out.println("---------POTENTIAL MOVE: " + p.toString());
+                        potMoves.add(p);
+                    }
+                    moveIfNotJumping(row, col, destRow, destCol);
+                    if (move.validKing(destRow, destCol)) {
+                        board[destRow][destCol].setType(Type.king);
+                    }
                 }
             }
         }
+        else
+        {
+            System.out.println("Invalid checker!");
+        }
+        potMoves.clear();
     }
 
     public void removeChecker(int row, int col)
@@ -215,9 +188,13 @@ public class Board
                         removetakenPiece(row - 1, col + 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
-                        potMoves = new Point[BOARD_SIZE];
                         pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), removedPiece);
                         PastMoves.addMove(pm);
+
+                        if(move.couldJump(destRow, destCol).isEmpty())
+                            nextTurn();
+                        else
+                            highlightTile(destRow, destCol);
                     }
                 }
                 //check if left
@@ -227,9 +204,13 @@ public class Board
                         removetakenPiece(row - 1, col - 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
-                        potMoves = new Point[BOARD_SIZE];
                         pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), removedPiece);
                         PastMoves.addMove(pm);
+
+                        if(move.couldJump(destRow, destCol).isEmpty())
+                            nextTurn();
+                        else
+                            highlightTile(destRow, destCol);
                     }
                 }
             }
@@ -244,9 +225,13 @@ public class Board
                         removetakenPiece(row + 1, col + 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
-                        potMoves = new Point[BOARD_SIZE];
                         pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), removedPiece);
                         PastMoves.addMove(pm);
+
+                        if(move.couldJump(destRow, destCol).isEmpty())
+                            nextTurn();
+                        else
+                            highlightTile(destRow, destCol);
                     }
                 }
                 if (destCol + 2 == col) {
@@ -256,9 +241,13 @@ public class Board
                         removetakenPiece(row + 1, col - 1);
                         board[destRow][destCol] = board[row][col];
                         removeChecker(row, col);
-                        potMoves = new Point[BOARD_SIZE];
                         pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), removedPiece);
                         PastMoves.addMove(pm);
+
+                        if(move.couldJump(destRow, destCol).isEmpty())
+                            nextTurn();
+                        else
+                            highlightTile(destRow, destCol);
                     }
                 }
             }
@@ -269,41 +258,41 @@ public class Board
     {
         PreviousMove pm;
         if(getChecker(row, col) != null && (getChecker(row,col).getColour() == Colour.WHITE && getChecker(row,col).getType() == Type.normal) || getChecker(row, col).getType() == Type.king) {
-            if (destRow +1 == row)
+            if (destRow +1 == row && validPos(destRow, destCol) && board[destRow][destCol]== null)
             {
                 if (destCol - 1 == col) {
                     board[destRow][destCol] = board[row][col];
                     removeChecker(row, col);
-                    potMoves = new Point[BOARD_SIZE];
                     pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), null);
                     PastMoves.addMove(pm);
+                    nextTurn();
                 }
                 if (destCol + 1 == col) {
                     board[destRow][destCol] = board[row][col];
                     removeChecker(row, col);
-                    potMoves = new Point[BOARD_SIZE];
                     pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), null);
                     PastMoves.addMove(pm);
+                    nextTurn();
                 }
             }
         }
         if(getChecker(row, col) != null && ((getChecker(row,col).getColour() == Colour.BLACK && getChecker(row,col).getType() == Type.normal) || getChecker(row, col).getType() == Type.king))
         {
-            if (destRow -1 == row)
+            if (destRow -1 == row && validPos(destRow, destCol) && board[destRow][destCol]== null)
             {
                 if (destCol - 1 == col) {
                     board[destRow][destCol] = board[row][col];
                     removeChecker(row, col);
-                    potMoves = new Point[BOARD_SIZE];
                     pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), null);
                     PastMoves.addMove(pm);
+                    nextTurn();
                 }
                 if (destCol + 1 == col) {
                     board[destRow][destCol] = board[row][col];
                     removeChecker(row, col);
-                    potMoves = new Point[BOARD_SIZE];
                     pm = new PreviousMove(new Point(row, col), new Point(destRow, destCol), null);
                     PastMoves.addMove(pm);
+                    nextTurn();
                 }
             }
         }
@@ -314,6 +303,7 @@ public class Board
     {
         if(validPos(row, col))
             return board[row][col];
+
         return null;
     }
 
@@ -350,20 +340,25 @@ public class Board
 
                 if (board[i][j] != null && board[i][j].getColour() == Colour.WHITE && board[i][j].getType() == Type.normal)
                 {
-                    g2d.setColor(Color.white);
+                    g2d.drawImage(tache, x + 5, y + 5, null);
                 }
                 if (board[i][j] != null && board[i][j].getColour() == Colour.BLACK && board[i][j].getType() == Type.normal )
                 {
-                    g2d.setColor(Color.DARK_GRAY);
+                    g2d.drawImage(ninja, x + 5, y + 5, null);
                 }
-                if(board[i][j] != null && board[i][j].getType() == Type.king)
+                if(board[i][j] != null && board[i][j].getType() == Type.king && board[i][j].getColour() == Colour.BLACK)
                 {
-                    g2d.setColor(Color.MAGENTA);
+                    g2d.drawImage(ninjaKing, x + 5, y + 5, null);
+                }
+                if(board[i][j] != null && board[i][j].getType() == Type.king && board[i][j].getColour() == Colour.WHITE)
+                {
+                    g2d.drawImage(tacheKing, x + 5, y + 5, null);
                 }
                 //increment the x so that there is a new square beside the last
 
-                g2d.fillOval(x + 10, y + 10, 3 * WIDTH / 4, 3 * HEIGHT / 4);
+                //g2d.fillOval(x + 10, y + 10, 3 * WIDTH / 4, 3 * HEIGHT / 4);
                 x += WIDTH;
+                Pieces.add(board[i][j]);
             }
 
             if(highlight != null) {
@@ -371,11 +366,11 @@ public class Board
                 g2d.drawRect(highlight.getCol() * 60, highlight.getRow() * 60, 60, 60);
             }
         }
-        for(int index = 0; index < potMoves.length; index++) {
-            if(potMoves[index] != null)
-            {
+
+        if(!potMoves.isEmpty()) {
+            for (Point p : potMoves) {
                 g2d.setColor(Color.yellow);
-                g2d.fillRect(potMoves[index].getCol() *60, potMoves[index].getRow() *60, WIDTH, HEIGHT);
+                g2d.fillRect(p.getCol() * 60, p.getRow() * 60, WIDTH, HEIGHT);
             }
         }
 
@@ -390,6 +385,42 @@ public class Board
         board = new Piece[BOARD_SIZE][BOARD_SIZE];
         installCheckers();
     }
+
+    public void nextTurn()
+    {
+        player1turn = !player1turn;
+    }
+
+    private boolean validPlayer(int row, int col) {
+        if(getChecker(row, col) ==  null)
+            return false;
+        if(getChecker(row, col).getColour() == Colour.WHITE && player1turn)
+            return true;
+        if(getChecker(row, col).getColour() == Colour.BLACK && !player1turn)
+            return true;
+
+        return false;
+    }
+
+    public int currPlayer()
+    {
+        if(player1turn)
+            return 1;
+
+        return 2;
+    }
+
+    public void AI()
+    {
+        Random rn = new Random();
+        int decision = rn.nextInt(4);
+
+        for (Piece p : Pieces) {
+            //choose a random Piece from all the Pieces
+        }
+//        highlightTile();
+    }
+
 }
 
 

@@ -27,4 +27,9 @@ public class Point
     {
         this.col = col;
     }
+
+    @Override
+    public String toString() {
+        return this.row + ", " + this.col;
+    }
 }

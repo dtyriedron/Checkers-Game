@@ -5,6 +5,7 @@ import javax.swing.*;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import static java.sql.Types.NULL;
 
@@ -20,73 +21,59 @@ public class Move extends JPanel
     private Piece piece;
     private Type type;
     private static Timer timer;
+    public ArrayList<Point> potPoints;
+    public ArrayList<Point> potJumps;
+    public int moveindex;
+    public int jumpIndex;
+
     public Move(Board b)
     {
         this.board = b;
     }
 
-    public boolean couldjumpRight(int row, int col)
-    {
-        if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.WHITE) && (board.getChecker(row, col).getType() == Type.normal)))) {
-            if (board.getChecker(row - 1, col + 1) != null && board.getChecker(row - 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.validPos(row - 2, col + 2) &&board.getChecker(row - 2, col + 2) == null) {
-                if(board.getChecker(row - 1,col + 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king)
-                {
-                    System.out.println("can jump right");
-                    return true;
-                }
 
-            }
-        }
-        if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.BLACK) && (board.getChecker(row, col).getType() == Type.normal)))) {
-            if (board.getChecker(row + 1, col + 1) != null && board.getChecker(row + 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.validPos(row + 2, col + 2) && board.getChecker(row + 2, col + 2) == null) {
-                if(board.getChecker(row + 1,col + 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king)
-                {
-                    System.out.println("can jump right");
-                    return true;
-                }
-
-            }
-        }
-        return false;
-    }
-    public boolean couldjumpLeft(int row, int col)
+    public ArrayList<Point> couldJump(int row, int col)
     {
+        potJumps = new ArrayList<>();
+        jumpIndex = 0;
         if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.WHITE) && (board.getChecker(row, col).getType() == Type.normal)))) {
-            if (board.getChecker(row - 1, col - 1) != null && board.getChecker(row - 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.validPos(row - 2, col - 2) && board.getChecker(row - 2, col - 2) == null) {
+            if (board.getChecker(row - 1, col - 1) != null && board.getChecker(row - 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.getChecker(row - 2, col - 2) == null && board.validPos(row - 2, col - 2)) {
                 if (board.getChecker(row - 1, col - 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king) {
                     System.out.println("can jump left");
-                    return true;
+                    potJumps.add(new Point(row - 2, col - 2));
                 }
             }
         }
         if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.BLACK) && (board.getChecker(row, col).getType() == Type.normal))))
         {
-            if (board.getChecker(row + 1, col - 1) != null && board.getChecker(row + 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.validPos(row + 2, col - 2) &&board.getChecker(row + 2, col - 2) == null)
+            if (board.getChecker(row + 1, col - 1) != null && board.getChecker(row + 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.getChecker(row + 2, col - 2) == null && board.validPos(row + 2, col - 2))
             {
                 if (board.getChecker(row + 1, col - 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king) {
                     System.out.println("can jump left");
-                    return true;
+                    potJumps.add(new Point(row + 2, col - 2));
                 }
             }
         }
-        return false;
-    }
+        if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.WHITE) && (board.getChecker(row, col).getType() == Type.normal)))) {
+            if (board.getChecker(row - 1, col + 1) != null && board.getChecker(row - 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.getChecker(row - 2, col + 2) == null && board.validPos(row - 2, col + 2)) {
+                if(board.getChecker(row - 1,col + 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king)
+                {
+                    System.out.println("can jump right");
+                    potJumps.add(new Point(row - 2, col + 2));
+                }
 
-    public boolean couldJump(int row, int col)
-    {
-        if (couldjumpLeft(row, col)) {
-            return true;
+            }
         }
-        if (couldjumpRight(row, col))
-            return true;
-
-//            if(board.getChecker(row,col) != null && board.getChecker(row,col).getType() == Type.king)
-//            {
-//                if(board.getChecker(destRow, destCol) == null && ((row - 2 == destRow && col + 2 == destCol) || (row - 2 == destRow && col - 2 == destCol) || (row + 2 == destRow && col + 2 == destCol) || (row + 2 == destRow && col - 2 == destCol)))
-//                    return true;
-//            }
-
-        return false;
+        if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.BLACK) && (board.getChecker(row, col).getType() == Type.normal)))) {
+            if (board.getChecker(row + 1, col + 1) != null && board.getChecker(row + 1, col + 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.getChecker(row + 2, col + 2) == null && board.validPos(row + 2, col + 2)) {
+                if(board.getChecker(row + 1,col + 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king)
+                {
+                    System.out.println("can jump right");
+                    potJumps.add(new Point(row + 2, col + 2));
+                }
+            }
+        }
+        return potJumps;
     }
 
     public Colour oppositeColour(Colour c)
@@ -106,29 +93,27 @@ public class Move extends JPanel
             return false;
     }
 
-    public boolean couldMove(int row, int col)
+    public ArrayList<Point> couldMove(int row, int col)
     {
-            if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.WHITE && board.getChecker(row, col).getType() == Type.normal) {
+        potPoints = new ArrayList<>();
+        moveindex = 0;
+            if (board.getChecker(row, col) != null && (board.getChecker(row, col).getColour() == Colour.WHITE && board.getChecker(row, col).getType() == Type.normal) || board.getChecker(row, col).getType() == Type.king) {
                 if (board.getChecker(row - 1, col + 1) == null && board.validPos(row - 1, col + 1)) {
-                    return true;
+                    potPoints.add(new Point(row - 1, col + 1));
                 }
                 if (board.getChecker(row - 1, col - 1) == null && board.validPos(row - 1, col - 1)) {
-                    return true;
+                    potPoints.add(new Point(row - 1, col - 1));
                 }
-
-            } else if (board.getChecker(row, col) != null && board.getChecker(row, col).getColour() == Colour.BLACK && board.getChecker(row, col).getType() == Type.normal) {
+            }
+            if (board.getChecker(row, col) != null && (board.getChecker(row, col).getColour() == Colour.BLACK && board.getChecker(row, col).getType() == Type.normal)|| board.getChecker(row, col).getType() == Type.king) {
                 if (board.getChecker(row + 1, col + 1) == null && board.validPos(row + 1, col + 1)) {
-                    return true;
+                    potPoints.add(new Point(row + 1, col + 1));
                 }
                 if (board.getChecker(row + 1, col - 1) == null && board.validPos(row + 1, col - 1)) {
-                    return true;
+                    potPoints.add(new Point(row + 1, col - 1));
                 }
             }
-            if (board.getChecker(row, col) != null && board.getChecker(row, col).getType() == Type.king) {
-                if ((board.getChecker(row - 1, col + 1) == null || board.getChecker(row - 1, col - 1) == null || board.getChecker(row + 1, col + 1) == null || board.getChecker(row + 1, col - 1) == null))
-                    return true;
-            }
-        return false;
+        return potPoints;
     }
 
 
@@ -138,11 +123,13 @@ public class Move extends JPanel
             //System.out.println("this is the past move::: " + PastMoves.getLast().getOrigin().getCol() + "" + PastMoves.getLast().getOrigin().getRow() + "->" + PastMoves.getLast().getDest().getCol() + "" + PastMoves.getLast().getDest().getRow());
             //addChecker(pm);
             board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()];
-//        System.out.println(Board.removedPiece.getPoint().getRow()+ " "+ Board.removedPiece.getPoint().getCol());
+            //        System.out.println(Board.removedPiece.getPoint().getRow()+ " "+ Board.removedPiece.getPoint().getCol());
             if (pm.getTakenPiece() != null)
                 board.getBoard()[Board.removedPiece.getPoint().getRow()][Board.removedPiece.getPoint().getCol()] = Board.removedPiece;
 
             board.getBoard()[pm.getDest().getRow()][pm.getDest().getCol()] = null;
+            board.nextTurn();
+            board.potMoves.clear();
         }
         else
         {
@@ -161,6 +148,8 @@ public class Move extends JPanel
             board.getBoard()[pm.getOrigin().getRow()][pm.getOrigin().getCol()] = null;
 
             PastMoves.addMove(pm);
+            board.nextTurn();
+            board.potMoves.clear();
         }
         else
         {

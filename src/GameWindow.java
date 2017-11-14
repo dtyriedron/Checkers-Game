@@ -15,6 +15,7 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
     private Piece piece;
     private int clicks=0;
 
+    private static JLabel currentPlayer;
     private static JButton undo, redo, replay;
 
 
@@ -35,6 +36,7 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         addMouseMotionListener(this);
 
         board = new Board();
+        currentPlayer = new JLabel("");
         try {
             undo = new JButton(new ImageIcon(ImageIO.read(new File("images/undo.png"))));
             undo.setPreferredSize(new Dimension(40, 40));
@@ -169,11 +171,9 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         stop();
     }
 
-    private int x=0;
-
     public void update()
     {
-        x++;
+        currentPlayer.setText("Player "+board.currPlayer() + "'s turn");
     }
 
     public static void main(String[] args)
@@ -208,7 +208,9 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         gbc.anchor = GridBagConstraints.EAST;
         frame.add(redo, gbc);
 
-
+        //change the pos of currentplayer lbl
+        gbc.anchor = GridBagConstraints.NORTH;
+        frame.add(currentPlayer, gbc);
 
 
         frame.pack();
