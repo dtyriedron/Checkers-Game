@@ -1,13 +1,17 @@
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
 
 
-public class Board
+public class Board implements ActionListener
 {
     static final int HEIGHT = 60;
     static final int WIDTH = 60;
@@ -30,7 +34,11 @@ public class Board
 
     private Point highlight;
 
+    private GameType gameType;
+
     static public Piece removedPiece;
+
+    Timer timer;
 
     public static boolean player1turn = true;
 
@@ -40,8 +48,6 @@ public class Board
 
     //array to store checkers
     private Piece[][] board;
-
-    public ArrayList<Piece> Pieces = new ArrayList<>();
 
     //array to store the points where a potential move can be made
     public ArrayList<Point> potMoves = new ArrayList<>();
@@ -61,8 +67,8 @@ public class Board
         move = new Move(this);
         ai = new AI(this, move);
         System.out.println("CONSTRUCTOR, initialising pastMoves");
-        installCheckers();
 
+        installCheckers();
         try {
             ninja = ImageIO.read(new File("images/ninja.png"));
             ninjaKing = ImageIO.read(new File("images/ninja_king.png"));
@@ -76,9 +82,36 @@ public class Board
     }
 
 
-    public void setClicks()
+    public void gameSetup(GameType g)
     {
-         clicks=0;
+        if(g == GameType.AI_VS_AI)
+        {
+            StartGame(GameType.AI_VS_AI);
+            timer = new Timer(800, this);
+            timer.start();
+        }
+            else
+                StartGame(g);
+
+    }
+    @Override
+    public void actionPerformed(ActionEvent e)
+    {
+        if(e.getSource() == timer)
+            movePiece();
+        else
+            timer.stop();
+    }
+    public void StartGame(GameType g)
+    {
+        clearBoard();
+        gameType = g;
+        if(timer!= null && timer.isRunning())
+            timer.stop();
+        player1turn = true;
+        highlight = null;
+        PastMoves.getPreviousMoves().clear();
+        installCheckers();
     }
 
     public void installCheckers()
@@ -110,10 +143,6 @@ public class Board
         old_col = x;
 
 
-        //Piece _p = ai.getAIMove(Colour.BLACK);
-        //System.out.println(_p.getPoint().getRow() + " " + _p.getPoint().getCol());
-
-
         potMoves = new ArrayList<>();
 
         if(validPlayer(y, x)) {
@@ -122,7 +151,8 @@ public class Board
                     System.out.println("---------POTENTIAL MOVE: " + p.toString());
                     potMoves.add(p);
                 }
-            } else if (!move.couldMove(y, x).isEmpty()) {
+            }
+            else if (!move.couldMove(y, x).isEmpty()) {
                 for (Point p : move.couldMove(y, x)) {
                     System.out.println("---------POTENTIAL MOVE: " + p.toString());
                     potMoves.add(p);
@@ -145,15 +175,14 @@ public class Board
 
         piecewithJump = new ArrayList<>();
 
-        for (Piece[] p : board) {
-            //System.out.println("chee");
-            for(Piece piece : p) {
-                if (piece != null) {
-                    move.couldJump(piece.getPoint().getRow(), piece.getPoint().getCol());
-                    for(Point point : move.potJumps)
-                        if(!move.potJumps.isEmpty())
+        for (int i = 0; i<BOARD_SIZE; i++) {
+            for(int j=0; j<BOARD_SIZE; j++) {
+                Piece piece = getChecker(i,j);
+                if (piece != null && playerColour() == piece.getColour()) {
+                        if(!getJumps(i,j).isEmpty()) {
                             piecewithJump.add(piece);
-
+                            System.out.println("hello");
+                        }
                 }
             }
         }
@@ -162,13 +191,79 @@ public class Board
         //System.out.println("replay:::::: " + PastMoves.getPreviousMoves());
     }
 
+    public ArrayList getJumps(int row, int col)
+    {
+        ArrayList jumps = new ArrayList<>();
+
+        try {
+            if (getChecker(row, col) != null && ((getChecker(row, col).getType() == Type.king) || ((getChecker(row, col).getColour() == Colour.WHITE) && (getChecker(row, col).getType() == Type.normal)))) {
+                if (getChecker(row - 1, col - 1) != null && getChecker(row - 1, col - 1).getColour() == move.oppositeColour(getChecker(row, col).getColour()) && getChecker(row - 2, col - 2) == null && validPos(row - 2, col - 2)) {
+                    if (getChecker(row - 1, col - 1).getType() == getChecker(row, col).getType() || getChecker(row, col).getType() == Type.king) {
+                        jumps.add(new Point(row - 2, col - 2));
+                    }
+                }
+            }
+            if (getChecker(row, col) != null && ((getChecker(row, col).getType() == Type.king) || ((getChecker(row, col).getColour() == Colour.BLACK) && (getChecker(row, col).getType() == Type.normal)))) {
+                if (getChecker(row + 1, col - 1) != null && getChecker(row + 1, col - 1).getColour() == move.oppositeColour(getChecker(row, col).getColour()) && getChecker(row + 2, col - 2) == null && validPos(row + 2, col - 2)) {
+                    if (getChecker(row + 1, col - 1).getType() == getChecker(row, col).getType() || getChecker(row, col).getType() == Type.king) {
+                        jumps.add(new Point(row + 2, col - 2));
+                    }
+                }
+            }
+            if (getChecker(row, col) != null && ((getChecker(row, col).getType() == Type.king) || ((getChecker(row, col).getColour() == Colour.WHITE) && (getChecker(row, col).getType() == Type.normal)))) {
+                if (getChecker(row - 1, col + 1) != null && getChecker(row - 1, col + 1).getColour() == move.oppositeColour(getChecker(row, col).getColour()) && getChecker(row - 2, col + 2) == null && validPos(row - 2, col + 2)) {
+                    if (getChecker(row - 1, col + 1).getType() == getChecker(row, col).getType() || getChecker(row, col).getType() == Type.king) {
+                        jumps.add(new Point(row - 2, col + 2));
+                    }
+
+                }
+            }
+            if (getChecker(row, col) != null && ((getChecker(row, col).getType() == Type.king) || ((getChecker(row, col).getColour() == Colour.BLACK) && (getChecker(row, col).getType() == Type.normal)))) {
+                if (getChecker(row + 1, col + 1) != null && getChecker(row + 1, col + 1).getColour() == move.oppositeColour(getChecker(row, col).getColour()) && getChecker(row + 2, col + 2) == null && validPos(row + 2, col + 2)) {
+                    if (getChecker(row + 1, col + 1).getType() == getChecker(row, col).getType() || getChecker(row, col).getType() == Type.king) {
+                        jumps.add(new Point(row + 2, col + 2));
+                    }
+                }
+            }
+        }catch(NullPointerException ex)
+        {
+            System.out.println("null pointer (board.getJumps())");
+        }
+        return jumps;
+    }
+
+    public void movePiece()
+    {
+        if(gameType == GameType.AI_VS_AI) {
+            Piece _p = ai.getAIPiece(ai.currentAIColour());
+            Point _p_ = ai.getAIMove();
+            checkMove(_p.getPoint().getRow(), _p.getPoint().getCol(), _p_.getRow(), _p_.getCol());
+        }
+    }
+
     public void checkMove(int row, int col, int destRow, int destCol) {
         System.out.println("SIZE: " + piecewithJump.size());
 
         if(!piecewithJump.isEmpty()) {
             System.out.println("you have a jump");
+
+            if(validPlayer(row, col))
+            {
+                if ((!move.couldJump(row, col).isEmpty()))
+                {
+                    for (Point p : move.couldJump(row, col))
+                    {
+                        System.out.println("---------POTENTIAL MOVE: " + p.toString());
+                        potMoves.add(p);
+                    }
+                    moveIfJumping(row, col, destRow, destCol);
+                    if (move.validKing(destRow, destCol))
+                        board[destRow][destCol].setType(Type.king);
+
+                }
+            }
         }
-        if((validPlayer(row, col)) && !move.couldMove(row, col).isEmpty()){
+        else if((validPlayer(row, col)) && !move.couldMove(row, col).isEmpty()){
             for (Point p : move.couldMove(row, col)) {
                 System.out.println("---------POTENTIAL MOVE: " + p.toString());
                 potMoves.add(p);
@@ -176,21 +271,6 @@ public class Board
             moveIfNotJumping(row, col, destRow, destCol);
             if (move.validKing(destRow, destCol)) {
                 board[destRow][destCol].setType(Type.king);
-            }
-        }
-        if(validPlayer(row, col))
-        {
-            if ((!move.couldJump(row, col).isEmpty()))
-            {
-                for (Point p : move.couldJump(row, col))
-                {
-                    System.out.println("---------POTENTIAL MOVE: " + p.toString());
-                    potMoves.add(p);
-                }
-                moveIfJumping(row, col, destRow, destCol);
-                if (move.validKing(destRow, destCol))
-                    board[destRow][destCol].setType(Type.king);
-
             }
         }
         else
@@ -418,7 +498,6 @@ public class Board
     public void clearBoard()
     {
         board = new Piece[BOARD_SIZE][BOARD_SIZE];
-        installCheckers();
     }
 
     public void nextTurn()

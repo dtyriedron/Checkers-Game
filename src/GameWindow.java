@@ -2,6 +2,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Scanner;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -27,13 +28,15 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
     private boolean isRunning = false;
 
 
-    private GameWindow()
+    public GameWindow()
     {
+        inputType();
         System.out.println("constructor called");
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setFocusable(true);
         addMouseListener(this);
         addMouseMotionListener(this);
+
 
         board = new Board();
         currentPlayer = new JLabel("");
@@ -53,7 +56,6 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         catch (IOException ex) {
             System.out.println(ex.toString());
         }
-
         start();
     }
 
@@ -64,6 +66,7 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
             Move.redoMove();
         if(e.getSource() == replay)
             Move.replayGame();
+
     }
 
     public void mousePressed(MouseEvent e)
@@ -171,6 +174,23 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         stop();
     }
 
+    private void inputType()
+    {
+        Scanner reader = new Scanner(System.in);
+        System.out.println("Enter a number to get a game type: (1= player vs player, 2= player vs ai 3=ai vs ai)");
+        int n = reader.nextInt();
+        try {
+            if (n == 1) {
+                board.gameSetup(GameType.PLAYER_VS_PLAYER);
+            }
+            if (n == 2) {
+                board.gameSetup(GameType.PLAYER_VS_AI);
+            }
+            if (n == 3) {
+                board.gameSetup(GameType.AI_VS_AI);
+            }
+        }catch(Exception e){}
+    }
     public void update()
     {
         currentPlayer.setText("Player "+board.currPlayer() + "'s turn");
@@ -186,9 +206,9 @@ public class GameWindow extends JPanel implements ActionListener, MouseListener,
         frame.setLayout(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
 
+
         gbc.gridy = 0;
         gbc.gridx = 0;
-        gbc.weighty = 1;
         gbc.anchor = GridBagConstraints.NORTH;
         frame.add(new GameWindow(), gbc);
 

@@ -22,9 +22,7 @@ public class Move extends JPanel
     private Type type;
     private static Timer timer;
     public ArrayList<Point> potPoints;
-   public  ArrayList<Point> potJumps = new ArrayList<>();
-    public int moveindex;
-    public int jumpIndex;
+    public  ArrayList<Point> potJumps = new ArrayList<>();
 
     public Move(Board b)
     {
@@ -34,8 +32,6 @@ public class Move extends JPanel
 
     public ArrayList<Point> couldJump(int row, int col)
     {
-
-        jumpIndex = 0;
         if (board.getChecker(row, col) != null && ((board.getChecker(row, col).getType() == Type.king) || ((board.getChecker(row, col).getColour() == Colour.WHITE) && (board.getChecker(row, col).getType() == Type.normal)))) {
             if (board.getChecker(row - 1, col - 1) != null && board.getChecker(row - 1, col - 1).getColour() == oppositeColour(board.getChecker(row, col).getColour()) && board.getChecker(row - 2, col - 2) == null && board.validPos(row - 2, col - 2)) {
                 if (board.getChecker(row - 1, col - 1).getType() == board.getChecker(row, col).getType() || board.getChecker(row, col).getType() == Type.king) {
@@ -96,7 +92,6 @@ public class Move extends JPanel
     public ArrayList<Point> couldMove(int row, int col)
     {
         potPoints = new ArrayList<>();
-        moveindex = 0;
             if (board.getChecker(row, col) != null && (board.getChecker(row, col).getColour() == Colour.WHITE && board.getChecker(row, col).getType() == Type.normal) || board.getChecker(row, col).getType() == Type.king) {
                 if (board.getChecker(row - 1, col + 1) == null && board.validPos(row - 1, col + 1)) {
                     potPoints.add(new Point(row - 1, col + 1));
@@ -160,6 +155,7 @@ public class Move extends JPanel
     {
         //loop for every previous move
         board.clearBoard();
+        board.installCheckers();
         timer = new Timer(900, e -> {
             if(!PastMoves.getPreviousMoves().isEmpty()) {
                 PreviousMove pm = PastMoves.getPreviousMoves().removeLast();
