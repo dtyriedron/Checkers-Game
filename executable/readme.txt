@@ -1,0 +1,1 @@
+open run.bat to start the game.

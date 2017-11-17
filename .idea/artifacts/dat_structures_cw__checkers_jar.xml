@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="dat structures cw- checkers:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/dat_structures_cw__checkers_jar</output-path>
+    <root id="archive" name="dat structures cw- checkers.jar">
+      <element id="module-output" name="dat structures cw- checkers" />
+    </root>
+  </artifact>
+</component>
